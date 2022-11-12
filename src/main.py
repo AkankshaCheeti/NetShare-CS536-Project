@@ -13,7 +13,7 @@ from gan.util import dict_product, chunks, load_config, load_measurers, configs2
 def kill_all_jobs(root_user, measurer_IPs):
     for measurer_ip in measurer_IPs:
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f generate.py &\""
-        cmd = "\"sudo pkill python3 &\""
+        cmd = "sudo pkill python3 &"
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 train.py configs_config4.json' &\""
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 generate' &\""
         ## cmd = cmd.format(root_user, measurer_ip) ##
@@ -173,7 +173,7 @@ def main(args):
 
     if args.check_remaining_processes:
         for measurer_ip in measurer_IPs:
-            cmd = "\"ps aux | grep python3 | wc -l \""
+            cmd = "ps aux | grep python3 | wc -l "
             ## cmd = cmd.format(args.root_user, measurer_ip) ##
             print(measurer_ip)
 
@@ -216,7 +216,7 @@ def main(args):
                     measurer_ip = dict_configIdx_measureIP[config_idx][1]
                     log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                    cmd = "\"cd {0} &&  python3 {1} {2} {3} \" > {4} 2>&1 &"
+                    cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
                     cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                     print(cmd)
 
@@ -244,7 +244,7 @@ def main(args):
                     measurer_ip = dict_configIdx_measureIP[config_idx][1]
                     log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                    cmd = "\"cd {0} &&  python3 {1} {2} {3} \" > {4} 2>&1 &"
+                    cmd = "cd {0} &&  python3 {1} {2} {3} > {4} 2>&1 &"
                     cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                     print(cmd)
 
@@ -278,7 +278,7 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[config_idx][1]
             log_file = os.path.join(configs[config_idx]["result_folder"], "worker_generate_attr.log")
 
-            cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
+            cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
             cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
             print(cmd)
 
@@ -328,7 +328,7 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
 
             log_file = os.path.join(eval_root_folder, "worker_merge_attr.log")
-            cmd = "\"cd {0} && python3 {1} {2} {3} {4} {5} \" > {6} 2>&1 &"
+            cmd = "cd {0} && python3 {1} {2} {3} {4} {5} > {6} 2>&1 &"
             # TODO: CHANGE WORD2VEC_SIZE AND PCAP_INTERARRIVAL TO READ FROM CONFIGS
             cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "attr_raw"), 10, 1, len(config_group["config_ids"]), log_file)
             print(cmd)
@@ -364,7 +364,7 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[config_idx][1]
             log_file = os.path.join(configs[config_idx]["result_folder"], "worker_generate_givenattr.log")
 
-            cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
+            cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
             cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
             print(cmd)
 
@@ -430,7 +430,7 @@ def main(args):
         #     measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
             
         #     log_file = os.path.join(eval_root_folder, "worker_merge_syndf.log")
-        #     cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
+        #     cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
 
         #     cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "syn_dfs"), config["num_chunks"], log_file)
         #     print(cmd)

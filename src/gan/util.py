@@ -568,8 +568,8 @@ def wait_for_chunk0(root_user, config_group_id, configs, config_ids, dict_config
                 measurer_ip = dict_configIdx_measureIP[config_idx][1]
                 log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"conda activate {2} && cd {3} &&  python3 {4} {5} {6} \" > {7} 2>&1 &"
-                cmd = cmd.format(root_user, measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+                cmd = "cd {0} &&  python3 {1} {2} {3} > {4} 2>&1 &"
+                cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                 print(cmd)
 
                 subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
