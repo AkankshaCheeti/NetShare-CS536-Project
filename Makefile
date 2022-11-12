@@ -10,6 +10,9 @@ export PYTHON 		= python3
 train-no-dp:
 	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) --config_file config_test1_pcap_no_dp --measurer_file measurers_localhost.ini --measurement
 
+generate-no-dp:
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) --config_file config_test1_pcap_no_dp --measurer_file measurers_localhost.ini --generation
+
 clean-results:
 	rm -rf $(RESULTS_DIR)
 
