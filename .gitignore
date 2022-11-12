@@ -139,3 +139,4 @@ dmypy.json
 .pyre/
 
 main_traces
+*.vars

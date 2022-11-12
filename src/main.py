@@ -482,5 +482,6 @@ if __name__ == "__main__":
     parser.add_argument('--cleanup_generated_samples_folder', action='store_true', default=False)
 
     args = parser.parse_args()
+    print(vars(args))
 
     main(args)
