@@ -6,6 +6,24 @@
 
 **Abstract:** We explore the feasibility of using Generative Adversarial Networks (GANs) to automatically learn generative models to generate synthetic packet- and flow header traces for network-ing tasks (e.g., telemetry, anomaly detection, provisioning). We identify key fidelity, scalability, and privacy challenges and tradeoffs in existing GAN-based approaches. By synthesizing domain-specific insights with recent advances in machine learning and privacy, we identify design choices to tackle these challenges. Building on these insights, we develop an end-to-end framework, NetShare. We evaluate NetShare on six diverse packet header traces and find that: (1) across distributional metrics and traces, it achieves 46% more accuracy than baselines, and (2) it meets users’ requirements of downstream tasks in evaluating accuracy and rank ordering of candidate approaches.
 
+# CS536 Project Setup
+## Run the following Makefile targets in this order
+```sh
+cd /path/to/NetShare/home-directory/
+
+# 1. To preprocess the dataset without differential privacy
+make preprocess-no-dp
+
+# 2. Clean the previous training outputs before retraining
+make clean-results
+
+# 3. To train the GAN
+make train-no-dp
+
+# 4. To generate using the trained GAN
+make generate-no-dp
+
+```
 
 # Setup
 ## Single-machine setup
