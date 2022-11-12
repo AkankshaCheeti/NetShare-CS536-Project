@@ -13,8 +13,8 @@ export CONTAINER_PREPROCESSING_DIR	= $(CONTAINER_WORK_DIR)/preprocess
 export CONTAINER_RESULTS_DIR 		= $(CONTAINER_WORK_DIR)/results
 
 export ROOT_USER 					= annusmanarchitect
-# export PYTHON 						= python3
-export PYTHON						= $(SCRIPTS_DIR)/python3.6
+export PYTHON 						= python3
+export PYTHON_DOCKER				= $(SCRIPTS_DIR)/python3.6
 
 .DEFAULT_GOAL						:= train-no-dp
 
@@ -28,12 +28,24 @@ preprocess-with-dp:
 	cd $(PREPROCESSING_DIR) && bash run_privacy.sh
 
 train-no-dp:
-	$(PYTHON) $(CONTAINER_SOURCE_DIR)/main.py --root_user $(ROOT_USER) \
-		--config_file $(CONTAINER_SOURCE_DIR)/config_test1_pcap_no_dp \
-		--measurer_file $(CONTAINER_SOURCE_DIR)/measurer_ini/measurers_localhost.ini --measurement
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --measurement
 
 generate-no-dp:
-	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) --config_file config_test1_pcap_no_dp --measurer_file measurers_localhost.ini --generation
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --generation
+
+docker-train-no-dp:
+	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --measurement"
+
+docker-generate-no-dp:
+	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --generation"
 
 clean-results:
 	rm -rf $(RESULTS_DIR)
