@@ -10,13 +10,13 @@ import itertools
 
 from gan.util import dict_product, chunks, load_config, load_measurers, configs2configsgroup, get_configid_from_kv, wait_for_chunk0
 
-def kill_all_jobs(measurer_IPs):
+def kill_all_jobs(root_user, measurer_IPs):
     for measurer_ip in measurer_IPs:
-        # cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"sudo pkill -f generate.py &\""
-        cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"sudo pkill python3 &\""
-        # cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"sudo pkill -f 'python3 train.py configs_config4.json' &\""
-        # cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"sudo pkill -f 'python3 generate' &\""
-        cmd = cmd.format(measurer_ip)
+        # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f generate.py &\""
+        cmd = "\"sudo pkill python3 &\""
+        # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 train.py configs_config4.json' &\""
+        # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 generate' &\""
+        ## cmd = cmd.format(root_user, measurer_ip) ##
         print(cmd)
 
         subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -38,7 +38,7 @@ def kill_partial_jobs(config_file, configs, dict_configIdx_measureIP):
         print("Config idx: {}, measurer_idx: {}, measurer_IP: {}".format(config_idx, measurer_idx, measurer_IP))
 
         # ssh_command = "ps -ef | grep 'python3 train.py configs_%s.json %s' | grep -v grep | awk '{print \$2}' | xargs -r sudo kill -9 &"%(config_file, config_idx)
-        # cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"{}\"".format(measurer_IP, ssh_command)
+        # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"{}\"".format(measurer_IP, ssh_command)
         # print(cmd)
 
         cmd = "rm -rf {}".format(configs[config_idx]["result_folder"])
@@ -173,8 +173,8 @@ def main(args):
 
     if args.check_remaining_processes:
         for measurer_ip in measurer_IPs:
-            cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"ps aux | grep python3 | wc -l \""
-            cmd = cmd.format(measurer_ip)
+            cmd = "\"ps aux | grep python3 | wc -l \""
+            ## cmd = cmd.format(args.root_user, measurer_ip) ##
             print(measurer_ip)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -186,7 +186,7 @@ def main(args):
         # print("remaining configs ids:", remaining_configs_ids)
 
     if args.kill_all_jobs:
-        kill_all_jobs(measurer_IPs)
+        kill_all_jobs(args.root_user, measurer_IPs)
     
     if args.kill_partial_jobs:
         kill_partial_jobs(args.config_file, configs, dict_configIdx_measureIP)
@@ -216,8 +216,8 @@ def main(args):
                     measurer_ip = dict_configIdx_measureIP[config_idx][1]
                     log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                    cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh && conda activate {} && cd {} &&  python3 {} {} {} \" > {} 2>&1 &"
-                    cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+                    cmd = "\"cd {0} &&  python3 {1} {2} {3} \" > {4} 2>&1 &"
+                    cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                     print(cmd)
 
                     subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -228,6 +228,7 @@ def main(args):
                 proc = Process(
                     target=wait_for_chunk0, 
                     args=(
+                        args.root_user,
                         config_group_id,
                         configs,
                         config_ids,
@@ -243,8 +244,8 @@ def main(args):
                     measurer_ip = dict_configIdx_measureIP[config_idx][1]
                     log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                    cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh && conda activate {} && cd {} &&  python3 {} {} {} \" > {} 2>&1 &"
-                    cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+                    cmd = "\"cd {0} &&  python3 {1} {2} {3} \" > {4} 2>&1 &"
+                    cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                     print(cmd)
 
                     subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -277,8 +278,8 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[config_idx][1]
             log_file = os.path.join(configs[config_idx]["result_folder"], "worker_generate_attr.log")
 
-            cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh &&  conda activate {} && cd {} &&  python3 {} {} {} \" > {} 2>&1 &"
-            cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+            cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
+            cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -327,9 +328,9 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
 
             log_file = os.path.join(eval_root_folder, "worker_merge_attr.log")
-            cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh &&  conda activate {} && cd {} &&  python3 {} {} {} {} {} \" > {} 2>&1 &"
+            cmd = "\"cd {0} && python3 {1} {2} {3} {4} {5} \" > {6} 2>&1 &"
             # TODO: CHANGE WORD2VEC_SIZE AND PCAP_INTERARRIVAL TO READ FROM CONFIGS
-            cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "attr_raw"), 10, 1, len(config_group["config_ids"]), log_file)
+            cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "attr_raw"), 10, 1, len(config_group["config_ids"]), log_file)
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -363,8 +364,8 @@ def main(args):
             measurer_ip = dict_configIdx_measureIP[config_idx][1]
             log_file = os.path.join(configs[config_idx]["result_folder"], "worker_generate_givenattr.log")
 
-            cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh &&  conda activate {} && cd {} &&  python3 {} {} {} \" > {} 2>&1 &"
-            cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+            cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
+            cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -429,9 +430,9 @@ def main(args):
         #     measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
             
         #     log_file = os.path.join(eval_root_folder, "worker_merge_syndf.log")
-        #     cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh &&  conda activate {} && cd {} && python3 {} {} {} \" > {} 2>&1 &"
+        #     cmd = "\"cd {0} && python3 {1} {2} {3} \" > {4} 2>&1 &"
 
-        #     cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "syn_dfs"), config["num_chunks"], log_file)
+        #     cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "syn_dfs"), config["num_chunks"], log_file)
         #     print(cmd)
 
         #     subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
@@ -446,6 +447,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     # must provide these params
+    parser.add_argument('--root_user', type=str)
     parser.add_argument('--config_file', type=str)
     parser.add_argument('--measurer_file', type=str)
 

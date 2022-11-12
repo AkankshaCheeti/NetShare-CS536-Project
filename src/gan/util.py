@@ -548,7 +548,7 @@ def configs2configsgroup(configs, generation_flag=False):
 #               len(config_ids) == number of chunks
 #   `dict_configIdx_measureIP`: config_id : measurer_ip
 #   `check_frequency`: interval (seconds) to check whether chunk0 is finished
-def wait_for_chunk0(config_group_id, configs, config_ids, dict_configIdx_measureIP, sub_python_file, config_json_file):
+def wait_for_chunk0(root_user, config_group_id, configs, config_ids, dict_configIdx_measureIP, sub_python_file, config_json_file):
 
     while True:
         chunk0_idx = config_ids[0]
@@ -568,8 +568,8 @@ def wait_for_chunk0(config_group_id, configs, config_ids, dict_configIdx_measure
                 measurer_ip = dict_configIdx_measureIP[config_idx][1]
                 log_file = os.path.join(configs[config_idx]["result_folder"], "worker_train.log")
 
-                cmd = "sudo ssh -o StrictHostKeyChecking=no root@{} \"source ~/anaconda3/etc/profile.d/conda.sh && conda activate {} && cd {} &&  python3 {} {} {} \" > {} 2>&1 &"
-                cmd = cmd.format(measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
+                cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"conda activate {2} && cd {3} &&  python3 {4} {5} {6} \" > {7} 2>&1 &"
+                cmd = cmd.format(root_user, measurer_ip, configs[config_idx]["conda_virtual_env"], configs[config_idx]["src_dir"], sub_python_file, config_json_file, config_idx, log_file)
                 print(cmd)
 
                 subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
