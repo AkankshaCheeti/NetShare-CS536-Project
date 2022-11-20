@@ -50,11 +50,11 @@ config = {
         "d_lr": 0.0001,
         "d_gp_coe": 10.0,
         "gen_feature_num_layers": 1,
-        "gen_feature_num_units": 100,
+        "gen_feature_num_units": 10,
         "gen_attribute_num_layers": 5,
-        "gen_attribute_num_units": 512,
+        "gen_attribute_num_units": 16,
         "disc_num_layers": 5,
-        "disc_num_units": 512,
+        "disc_num_units": 16,
         "initial_state": "random",
 
         "leaky_relu": False,
@@ -63,7 +63,7 @@ config = {
         "attr_d_gp_coe": 10.0,
         "g_attr_d_coe": 1.0,
         "attr_disc_num_layers": 5,
-        "attr_disc_num_units": 512,
+        "attr_disc_num_units": 16,
 
         # dir containg the src code
         "src_dir": "/home/annusmanarchitect/NetShare/src",

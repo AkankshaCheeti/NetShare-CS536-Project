@@ -420,25 +420,27 @@ def main(args):
 
         # combine synthetic dfs from different chunks
         # (and convert to pcap if applicable)
-        # print("Start combining synthetic dfs from different chunks ...")
-        # sub_python_file = "merge_syndf.py"
-        # for config_group in config_group_list:
-        #     chunk0_idx = config_group["config_ids"][0]
-        #     eval_root_folder = configs[chunk0_idx]["eval_root_folder"]
-        #     measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
+        print("Start combining synthetic dfs from different chunks ...")
+        sub_python_file = "merge_syndf.py"
+        for config_group in config_group_list:
+            chunk0_idx = config_group["config_ids"][0]
+            eval_root_folder = configs[chunk0_idx]["eval_root_folder"]
+            measurer_ip = dict_configIdx_measureIP[chunk0_idx][1]
             
-        #     log_file = os.path.join(eval_root_folder, "worker_merge_syndf.log")
-        #     cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
+            # log_file = os.path.join(eval_root_folder, "worker_merge_syndf.log")
+            # cmd = "cd {0} && python3 {1} {2} {3} > {4} 2>&1 &"
 
-        #     cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "syn_dfs"), config["num_chunks"], log_file)
-        #     print(cmd)
+            # cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, os.path.join(eval_root_folder, "syn_dfs"), config["num_chunks"], log_file)
+            # print(cmd)
+            
+            log_file = os.path.join(eval_root_folder, "worker_merge_syndf.log")
+            cmd = "cd {0} && python3 {1} --config_file {2} > {3} 2>&1 &"
 
-        #     subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
-        #     time.sleep(2)
+            cmd = cmd.format(configs[config_idx]["src_dir"], sub_python_file, args.config_file, log_file)
+            print(cmd)
 
-                
-                
-
+            subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
+            time.sleep(2)
 
 
 if __name__ == "__main__":
