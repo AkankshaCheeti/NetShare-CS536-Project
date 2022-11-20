@@ -12,6 +12,8 @@
 
 ## Run the following Makefile targets in this order
 ```sh
+conda activate NetShare
+
 cd /path/to/NetShare/home-directory/
 
 # 1. To preprocess the dataset without differential privacy
