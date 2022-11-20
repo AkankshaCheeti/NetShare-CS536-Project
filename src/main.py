@@ -1,14 +1,12 @@
-import sys, configparser, json, subprocess, time, argparse, datetime
-import importlib
-import os, re, copy, random, warnings
-import tensorflow as tf
-
-from multiprocessing import Process
-
 # https://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
 import itertools
-
+import importlib
+import tensorflow as tf
+from multiprocessing import Process
+import os, re, copy, random, warnings
+import sys, configparser, json, subprocess, time, argparse, datetime
 from gan.util import dict_product, chunks, load_config, load_measurers, configs2configsgroup, get_configid_from_kv, wait_for_chunk0
+
 
 def kill_all_jobs(root_user, measurer_IPs):
     for measurer_ip in measurer_IPs:

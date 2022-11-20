@@ -37,15 +37,15 @@ generate-no-dp:
 		--config_file config_test1_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --generation
 
-docker-train-no-dp:
-	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
-		--config_file config_test1_pcap_no_dp \
-		--measurer_file measurers_localhost.ini --measurement"
+# docker-train-no-dp:
+# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+# 		--config_file config_test1_pcap_no_dp \
+# 		--measurer_file measurers_localhost.ini --measurement"
 
-docker-generate-no-dp:
-	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
-		--config_file config_test1_pcap_no_dp \
-		--measurer_file measurers_localhost.ini --generation"
+# docker-generate-no-dp:
+# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+# 		--config_file config_test1_pcap_no_dp \
+# 		--measurer_file measurers_localhost.ini --generation"
 
 clean-results:
 	rm -rf $(RESULTS_DIR)
