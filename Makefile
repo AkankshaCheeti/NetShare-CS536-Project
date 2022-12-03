@@ -24,7 +24,7 @@ install-docker:
 preprocess-no-dp:
 	cd $(PREPROCESSING_DIR) && bash run_no_privacy.sh
 
-preprocess-no-dp-new-dataset:
+preprocess-no-dp-botnet-dataset:
 	cd $(PREPROCESSING_DIR) && bash run_no_privacy_new_dataset.sh
 
 preprocess-with-dp:
@@ -34,6 +34,26 @@ train-no-dp:
 	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
 		--config_file config_test1_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --measurement
+
+train-botnet-benign-no-dp:
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_botnet_benign_test_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --measurement
+
+train-botnet-malicious-no-dp:
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_botnet_malicious_test_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --measurement
+
+generate-botnet-benign-no-dp:
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_botnet_benign_test_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --generation
+
+generate-botnet-malicious-no-dp:
+	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_botnet_malicious_test_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --generation
 
 generate-no-dp:
 	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \

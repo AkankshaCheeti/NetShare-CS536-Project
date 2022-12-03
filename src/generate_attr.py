@@ -22,7 +22,7 @@ def closest(lst, K):
      return lst[idx]
 
 def trainDG(config):
-    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"]:
+    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"] or "/botnet_benign/" in config["dataset"] or "/botnet_malicious/" in config["dataset"]:
         data_type = "pcap"
     elif "ugr16" in config["dataset"] or "cidds" in config["dataset"] or "ton" in config["dataset"]:
         data_type = "netflow"

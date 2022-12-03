@@ -20,7 +20,7 @@ generatedSamples_per_epoch = 1
 def trainDG(config):
     print("Generating with config...", config)
 
-    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"]:
+    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"] or "/botnet_benign/" in config["dataset"] or "/botnet_malicious/" in config["dataset"]:
         data_type = "pcap"
     elif "ugr16" in config["dataset"] or "cidds" in config["dataset"] or "ton" in config["dataset"]:
         data_type = "netflow"
@@ -225,7 +225,7 @@ def trainDG(config):
                 last_iteration_found = True
 
             for generated_samples_idx in range(generatedSamples_per_epoch):
-                print("generate {}-th sample from iteration_id-{}".format(generated_samples_idx+1, iteration_id))
+                print("generate {} sample from iteration_id-{}".format(generated_samples_idx+1, iteration_id))
 
                 save_path = os.path.join(
                     config["result_folder"],

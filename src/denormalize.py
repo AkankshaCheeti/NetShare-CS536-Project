@@ -39,7 +39,7 @@ def denormalize(data_attribute, data_feature, data_gen_flag, config):
     elif "interarrival-True" in config["dataset"]:
         interarrival_flag = True
 
-    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"]:
+    if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"] or "/botnet_benign/" in config["dataset"] or "/botnet_malicious/" in config["dataset"]:
         file_type = "pcap"
     elif "ugr16" in config["dataset"]:
         file_type = "ugr16"

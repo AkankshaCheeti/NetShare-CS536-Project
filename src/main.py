@@ -11,7 +11,7 @@ from gan.util import dict_product, chunks, load_config, load_measurers, configs2
 def kill_all_jobs(root_user, measurer_IPs):
     for measurer_ip in measurer_IPs:
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f generate.py &\""
-        cmd = "sudo pkill python3 &"
+        cmd = "pkill python3 &"
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 train.py configs_config4.json' &\""
         # cmd = "ssh -o StrictHostKeyChecking=no {0}@{1} \"sudo pkill -f 'python3 generate' &\""
         ## cmd = cmd.format(root_user, measurer_ip) ##
@@ -247,6 +247,7 @@ def main(args):
                     print(cmd)
 
                     subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
+                    print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_launch_cmd"]))
                     time.sleep(configs[config_idx]["sleep_time_launch_cmd"])
             
             print()
@@ -281,6 +282,7 @@ def main(args):
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_launch_cmd"]))
             time.sleep(configs[config_idx]["sleep_time_launch_cmd"])
         
 
@@ -312,6 +314,7 @@ def main(args):
             else:
                 print("Generating attributes is finished!")
                 break
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_check_finish"]))
             time.sleep(configs[config_idx]["sleep_time_check_finish"])
         
         print("Finish generating attributes")
@@ -332,6 +335,7 @@ def main(args):
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_launch_cmd"]))
             time.sleep(configs[chunk0_idx]["sleep_time_launch_cmd"])
         
         while True:
@@ -353,6 +357,7 @@ def main(args):
             else:
                 print("Merging attributes is finished!")
                 break
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_check_finish"]))
             time.sleep(configs[config_idx]["sleep_time_check_finish"])
         
         # generate features given attribute
@@ -367,6 +372,7 @@ def main(args):
             print(cmd)
 
             subprocess.Popen(cmd, stderr=sys.stdout.fileno(), shell=True)
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_launch_cmd"]))
             time.sleep(configs[config_idx]["sleep_time_launch_cmd"])
 
         # wait for generating feature given attr
@@ -407,6 +413,7 @@ def main(args):
             else:
                 print("Generating features given attributes is finished")
                 break
+            print("Putting to sleep for {0} seconds".format(configs[config_idx]["sleep_time_check_finish"]))
             time.sleep(configs[config_idx]["sleep_time_check_finish"])
         
         time_end_generation = time.time()

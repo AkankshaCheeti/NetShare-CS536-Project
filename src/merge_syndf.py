@@ -188,7 +188,7 @@ def main(args):
                 "raw.csv"
                 ))
             
-            if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"]:
+            if "/caida/" in config["dataset"] or "/dc/" in config["dataset"] or "/ca/" in config["dataset"] or "/botnet_benign/" in config["dataset"] or "/botnet_malicious/" in config["dataset"]:
                 data_type = "pcap"
                 time_col_name = "time"
             elif "ugr16" in config["dataset"] or "cidds" in config["dataset"] or "ton" in config["dataset"]:
@@ -239,7 +239,7 @@ def main(args):
         if len(syn_dfs) > 1:
             raw_df = pd.read_csv(os.path.join("../data", dataset_dpnoisemultiplier_pair[0], "raw.csv"))
             dataset = dataset_dpnoisemultiplier_pair[0]
-            if "caida" in dataset or "dc" in dataset or "ca" in dataset:
+            if "caida" in dataset or "dc" in dataset or "ca" in dataset or "botnet_benign" in dataset or "botnet_malicious" in dataset:
                 data_type = "pcap"
             elif "ugr16" in dataset or "cidds" in dataset or "ton" in dataset:
                 data_type = "netflow"
@@ -282,7 +282,7 @@ def main(args):
         print("best_syn_df filename:", best_syndf_filename)
 
         # sort by timestamp
-        if "caida" in dataset or "dc" in dataset or "ca" in dataset:
+        if "caida" in dataset or "dc" in dataset or "ca" in dataset or "botnet_benign" in dataset or "botnet_malicious" in dataset:
             time_col_name = "time"
         elif "ugr16" in dataset or "cidds" in dataset or "ton" in dataset:
             time_col_name = "ts"
