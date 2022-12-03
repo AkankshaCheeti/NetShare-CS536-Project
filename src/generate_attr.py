@@ -238,6 +238,7 @@ def trainDG(config):
                 print("Not found {}".format(mid_checkpoint_dir))
                 continue
             else:
+                print("Found last checkpoint {} in generate_attr.py".format(mid_checkpoint_dir))
                 last_iteration_found = True
 
             for generated_samples_idx in range(generatedSamples_per_epoch):

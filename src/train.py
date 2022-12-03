@@ -159,7 +159,7 @@ def trainDG(config):
 
         gan.build()
         # print("restore_flag:", restore_flag)
-        gan.train(restore=config["restore"])
+        gan.train(restore=config["restore"], outdated_checkpoint_after_saves=config["outdated_checkpoint_after_saves"])
 
     dataset.stop_data_loader()
 

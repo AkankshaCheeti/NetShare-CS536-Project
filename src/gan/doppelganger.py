@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 import datetime
+import shutil
 import os
 import math
 import sys
@@ -1060,7 +1061,7 @@ class DoppelGANger(object):
              ground_truth_feature, ground_truth_attribute, ground_truth_length,
              "teacher")
 
-    def train(self, feature_network_checkpoint_path=None, restore=False):
+    def train(self, feature_network_checkpoint_path=None, restore=False, outdated_checkpoint_after_saves=None):
         tf.global_variables_initializer().run()
 
         # TEMPORARY CHANGE: USE RESTORE TO LOAD PRETRAINED MODEL
@@ -1239,3 +1240,10 @@ class DoppelGANger(object):
                         self.checkpoint_dir,
                         "iteration_id-{}".format(batch_id))
                     self.save(global_id - 1, saver, checkpoint_dir)
+                    # delete any former checkpoints that are outdated (behind 5 checkpoints)
+                    if outdated_checkpoint_after_saves is not None:
+                        outdated_checkpoint = os.path.join(self.checkpoint_dir, "iteration_id-{}".format(batch_id - self.extra_checkpoint_freq*outdated_checkpoint_after_saves))
+                        if os.path.exists(outdated_checkpoint):
+                            print("Deleting Outdated Checkpoint: {0}".format(outdated_checkpoint))
+                            shutil.rmtree(outdated_checkpoint)
+                            pass

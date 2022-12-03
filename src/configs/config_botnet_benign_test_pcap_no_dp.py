@@ -97,11 +97,12 @@ config = {
             "dataset": dict_alias_data["botnet_benign"],
             "max_flow_len": [dict_alias_maxFlowLen["botnet_benign"]],
             "num_chunks": [len(dict_alias_data["botnet_benign"])],
-            "iteration": [40],
+            "iteration": [100],
             "run": [0],
             "sample_len": [10],
-            "extra_checkpoint_freq": [10],
+            "extra_checkpoint_freq": [1],
             "epoch_checkpoint_freq": [5],
+            "outdated_checkpoint_after_saves": [5],
 
             # pretrain_non_DP: only use for non-DP version
             #   True: the first chunk will be trained first and every following chunk will be trained on this chunk (fewer total CPU hours)
