@@ -24,6 +24,9 @@ install-docker:
 preprocess-no-dp:
 	cd $(PREPROCESSING_DIR) && bash run_no_privacy.sh
 
+preprocess-no-dp-new-dataset:
+	cd $(PREPROCESSING_DIR) && bash run_no_privacy_new_dataset.sh
+
 preprocess-with-dp:
 	cd $(PREPROCESSING_DIR) && bash run_privacy.sh
 

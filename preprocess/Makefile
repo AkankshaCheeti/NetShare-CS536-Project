@@ -2,6 +2,7 @@ CC=gcc
 IFLAG=
 LINKER= -lm -lpcap
 PROFILER=
+LIB_DIR=compiled
 
 pcapParser: main.o
 	$(CC) -o pcapParser compiled/main.o $(LINKER) $(PROFILER)
