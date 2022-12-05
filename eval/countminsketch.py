@@ -48,7 +48,8 @@ class CountMinSketch(object):
         ''' Method to combine two count min sketches
         @param new_cms CountMinSketch: Another CMS object
         '''
-        return self.table + new_cms
+        return self.table + new_cms        
+
 
 if __name__ == '__main__':
     param_w = 10000
@@ -56,20 +57,37 @@ if __name__ == '__main__':
     seeds = np.random.randint(param_w, size = param_d)
     cms = CountMinSketch(10000, 5, seeds = seeds)
 
-    # read raw data
-    dataset = "eval/caida"
+    # read raw data (correct the path)
+    dataset = "caida/"
     raw_df = pd.read_csv(os.path.join(dataset, "raw.csv"))
     for dstip in raw_df.dstip:
         cms.increment(dstip.to_bytes(4, byteorder = 'big'))
-        if dstip == raw_df.dstip[2]:
-            ip = dstip
-
-
-    print(ip)
-    print(cms.estimate(ip.to_bytes(4, byteorder = 'big')))
 
     count = 0
+    countDictionary = {}
     for dstip in raw_df.dstip:
-        if dstip == raw_df.dstip[2]:
-            count = count + 1
-    print(count)
+        countDictionary[dstip.to_bytes(4, byteorder = 'big')] = 0
+
+    for dstip in raw_df.dstip:
+        countDictionary[dstip.to_bytes(4, byteorder = 'big')] = countDictionary[dstip.to_bytes(4, byteorder = 'big')] + 1
+
+    errorSum = 0 
+    for dstip in raw_df.dstip.unique():
+        dstip = int(dstip)
+        #print("IP:")
+        #print(dstip)
+        #print("CMS count")
+        #print(cms.estimate(dstip.to_bytes(4, byteorder = 'big')))
+        #print("real count")
+        #print(countDictionary[dstip.to_bytes(4, byteorder = 'big')])
+        error = (cms.estimate(dstip.to_bytes(4, byteorder = 'big')) - countDictionary[dstip.to_bytes(4, byteorder = 'big')])/countDictionary[dstip.to_bytes(4, byteorder = 'big')]
+        errorSum = errorSum + error
+
+    raw_df2 = raw_df['dstip'].unique()
+    print(raw_df2.size)
+    real_error = errorSum/raw_df2.size
+
+    print(real_error)
+
+    
+
