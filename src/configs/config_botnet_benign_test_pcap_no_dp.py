@@ -66,7 +66,7 @@ config = {
         "attr_disc_num_units": 512,
 
         # dir containg the src code
-        "src_dir": "/home/annusmanarchitect/NetShare/src",
+        "src_dir": "/home/annuszulfiqar/research/NetShare/src",
         # "pretrain_dir": None,
 
         "aux_disc": True,
@@ -97,7 +97,7 @@ config = {
             "dataset": dict_alias_data["botnet_benign"],
             "max_flow_len": [dict_alias_maxFlowLen["botnet_benign"]],
             "num_chunks": [len(dict_alias_data["botnet_benign"])],
-            "iteration": [1000],
+            "iteration": [40],
             "run": [0],
             "sample_len": [10],
             "extra_checkpoint_freq": [10],

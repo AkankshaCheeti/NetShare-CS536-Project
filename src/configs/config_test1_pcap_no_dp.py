@@ -66,7 +66,7 @@ config = {
         "attr_disc_num_units": 16,
 
         # dir containg the src code
-        "src_dir": "/home/annusmanarchitect/NetShare/src",
+        "src_dir": "/home/annuszulfiqar/research/NetShare/src",
         # "pretrain_dir": None,
 
         "aux_disc": True,
