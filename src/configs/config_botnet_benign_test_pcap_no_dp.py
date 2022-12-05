@@ -97,10 +97,10 @@ config = {
             "dataset": dict_alias_data["botnet_benign"],
             "max_flow_len": [dict_alias_maxFlowLen["botnet_benign"]],
             "num_chunks": [len(dict_alias_data["botnet_benign"])],
-            "iteration": [100],
+            "iteration": [1000],
             "run": [0],
             "sample_len": [10],
-            "extra_checkpoint_freq": [1],
+            "extra_checkpoint_freq": [10],
             "epoch_checkpoint_freq": [5],
             "outdated_checkpoint_after_saves": [5],
 

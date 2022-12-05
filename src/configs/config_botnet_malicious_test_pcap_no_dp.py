@@ -97,7 +97,7 @@ config = {
             "dataset": dict_alias_data["botnet_malicious"],
             "max_flow_len": [dict_alias_maxFlowLen["botnet_malicious"]],
             "num_chunks": [len(dict_alias_data["botnet_malicious"])],
-            "iteration": [100],
+            "iteration": [1000],
             "run": [0],
             "sample_len": [10],
             "extra_checkpoint_freq": [1],
