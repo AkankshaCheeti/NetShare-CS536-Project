@@ -80,11 +80,14 @@ if __name__ == '__main__':
         #print(cms.estimate(dstip.to_bytes(4, byteorder = 'big')))
         #print("real count")
         #print(countDictionary[dstip.to_bytes(4, byteorder = 'big')])
-        error = (cms.estimate(dstip.to_bytes(4, byteorder = 'big')) - countDictionary[dstip.to_bytes(4, byteorder = 'big')])/countDictionary[dstip.to_bytes(4, byteorder = 'big')]
+        error = (cms.estimate(dstip.to_bytes(4, byteorder = 'big')) - countDictionary[dstip.to_bytes(4, byteorder = 'big')])/cms.estimate(dstip.to_bytes(4, byteorder = 'big'))
+        #print("error")
+        #print(error)
         errorSum = errorSum + error
 
+    #print(errorSum)
     raw_df2 = raw_df['dstip'].unique()
-    print(raw_df2.size)
+    #print(raw_df2.size)
     real_error = errorSum/raw_df2.size
 
     print(real_error)
