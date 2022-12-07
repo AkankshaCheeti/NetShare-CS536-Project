@@ -88,6 +88,8 @@ generate-no-dp:
 ################################# Generate Results #####################################
 ########################################################################################
 
+######################################## CDF ###########################################
+
 generate-caida-cdf:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
 		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/caida/ \
@@ -105,6 +107,8 @@ generate-botnet-malicious-cdf:
 
 cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
 
+#################################### Bar Plots ########################################
+
 generate-ugr16-barplot:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
 		--method run_netflow_qualitative_plots \
@@ -112,6 +116,8 @@ generate-ugr16-barplot:
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 barplots: generate-ugr16-barplot
+
+##################################### Fidelity ########################################
 
 generate-caida-fidelity:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
@@ -132,6 +138,15 @@ generate-ugr16-fidelity:
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
+
+################################# Count-Min Sketch ####################################
+
+generate-caida-cms:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--keys srcip --width 10000 --depth 5
+
+#################################### All Plots ########################################
 
 plots: cdf barplots fidelity
 

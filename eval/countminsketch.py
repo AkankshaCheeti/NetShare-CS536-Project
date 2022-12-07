@@ -4,11 +4,15 @@
 @website: www.peterxeno.com
 '''
 
+from tqdm import tqdm
 import numpy as np
-import mmh3
 import pandas as pd
+from collections import defaultdict
 import sys, configparser, json, random, copy, math, os, pickle
+import argparse
 import socket
+import mmh3
+
 random.seed(42)
 
 class CountMinSketch(object):
@@ -50,47 +54,59 @@ class CountMinSketch(object):
         '''
         return self.table + new_cms        
 
-
-if __name__ == '__main__':
-    param_w = 10000
-    param_d = 5
-    seeds = np.random.randint(param_w, size = param_d)
-    cms = CountMinSketch(10000, 5, seeds = seeds)
+def evaluate_cms(args, file_name):
+    seeds = np.random.randint(args.width, size=args.depth)
+    cms = CountMinSketch(args.width, args.depth, seeds=seeds)
 
     # read raw data (correct the path)
-    dataset = "caida/"
-    raw_df = pd.read_csv(os.path.join(dataset, "raw.csv"))
-    for dstip in raw_df.dstip:
-        cms.increment(dstip.to_bytes(4, byteorder = 'big'))
+    data_df = pd.read_csv(os.path.join(args.dataset, file_name))
 
-    count = 0
-    countDictionary = {}
-    for dstip in raw_df.dstip:
-        countDictionary[dstip.to_bytes(4, byteorder = 'big')] = 0
-
-    for dstip in raw_df.dstip:
-        countDictionary[dstip.to_bytes(4, byteorder = 'big')] = countDictionary[dstip.to_bytes(4, byteorder = 'big')] + 1
-
-    errorSum = 0 
-    for dstip in raw_df.dstip.unique():
-        dstip = int(dstip)
-        #print("IP:")
-        #print(dstip)
-        #print("CMS count")
-        #print(cms.estimate(dstip.to_bytes(4, byteorder = 'big')))
-        #print("real count")
-        #print(countDictionary[dstip.to_bytes(4, byteorder = 'big')])
-        error = (cms.estimate(dstip.to_bytes(4, byteorder = 'big')) - countDictionary[dstip.to_bytes(4, byteorder = 'big')])/cms.estimate(dstip.to_bytes(4, byteorder = 'big'))
-        #print("error")
-        #print(error)
-        errorSum = errorSum + error
-
-    #print(errorSum)
-    raw_df2 = raw_df['dstip'].unique()
-    #print(raw_df2.size)
-    real_error = errorSum/raw_df2.size
-
-    print(real_error)
-
+    unique_values = set()
     
+    print("Populating CMS")
+    for _, series in tqdm(data_df.iterrows(), total=1e6):
+        value = ''.join([str(series[x]) for x in args.keys])
+        cms.increment(value)
+        # also populate the unique set
+        unique_values.add(value)
 
+    print("Creating Dictionary")
+    countDictionary = defaultdict(lambda: 0)
+    for _, value in tqdm(data_df.iterrows(), total=1e6):
+        value = ''.join([str(series[x]) for x in args.keys])
+        countDictionary[value] += 1
+
+    print("Calculating CMS Error")
+    errorSum, unique_value_count = 0, 0
+    for value in tqdm(unique_values):
+        error = abs(cms.estimate(value) - countDictionary[value]) / countDictionary[value]
+        errorSum += error
+        unique_value_count += 1
+
+    real_error = errorSum / unique_value_count
+    return real_error
+
+
+def main():
+    CLI = argparse.ArgumentParser()
+    CLI.add_argument("--dataset", type=str)
+    CLI.add_argument("--keys", type=str, nargs='*')
+    CLI.add_argument("--width", type=int)
+    CLI.add_argument("--depth", type=int)
+    print(vars(CLI.parse_args()))
+        
+    # convert incoming args to a dictionary
+    args = CLI.parse_args()
+    print("Evaluating real data..")
+    raw_error = evaluate_cms(args, file_name='raw.csv')
+    print("Evaluating synthetic data..")
+    syn_error = evaluate_cms(args, file_name='syn.csv')
+    print(f"Raw Error = {round(raw_error, 2)}")
+    print(f"Syn Error = {round(syn_error, 2)}")
+    relative_error = round(abs(syn_error - raw_error) / (1e-5 + raw_error) * 100, 2)
+    print(f"Relative Error = {relative_error}%")
+
+
+if __name__ == '__main__':
+    main()
+    
