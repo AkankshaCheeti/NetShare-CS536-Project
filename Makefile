@@ -141,10 +141,17 @@ fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ug
 
 ################################# Count-Min Sketch ####################################
 
+HASH						?= # mmh3, csiphash, horner
+
 generate-caida-cms:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) countminsketch.py \
 		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
-		--keys srcip --width 10000 --depth 5
+		--keys srcip dstip srcport dstport proto --hash $(HASH) --width 50000 --depth 5
+
+generate-botnet-malicious-cms:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+		--keys srcip dstip srcport dstport proto --hash $(HASH) --width 10000 --depth 5
 
 #################################### All Plots ########################################
 

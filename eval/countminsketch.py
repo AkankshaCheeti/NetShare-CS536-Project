@@ -1,9 +1,3 @@
-''' This module contains the class necessary to implement CountMinSketch
-
-@author: Peter Xenopoulos
-@website: www.peterxeno.com
-'''
-
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
@@ -11,75 +5,81 @@ from collections import defaultdict
 import sys, configparser, json, random, copy, math, os, pickle
 import argparse
 import socket
-import mmh3
 
-random.seed(42)
+import random
+import math
+from collections import Counter
 
-class CountMinSketch(object):
-    ''' Class for a CountMinSketch data structure
-    '''
-    def __init__(self, width, depth, seeds):
-        ''' Method to initialize the data structure
-        @param width int: Width of the table
-        @param depth int: Depth of the table (num of hash func)
-        @param seeds list: Random seed list
-        '''
-        self.width = width  #cols
-        self.depth = depth  #rows
-        self.table = np.zeros([depth, width])  # Create empty table
-        self.seed = seeds # np.random.randint(w, size = d) // create some seeds
+from cms_mmh3 import CountMinSketch as CMS_MMH3
+from cms_horner import CountMinSketch as CMS_HORNER
+from cms_csiphash import CountMinSketch as CMS_CSIPHASH
 
-    def increment(self, key):
-        ''' Method to add a key to the CMS
-        @param key str: A string to add to the CMS
-        '''
-        for i in range(0, self.depth):
-            index = mmh3.hash(key, self.seed[i]) % self.width
-            self.table[i, index] = self.table[i, index]+1
+CMS_COLLECTION = {
+    "mmh3":     CMS_MMH3,
+    "csiphash": CMS_CSIPHASH,
+    "horner":   CMS_HORNER
+}
 
-    def estimate(self, key):
-        ''' Method to estimate if a key is in a CMS
-        @param key str: A string to check
-        '''
-        min_est = self.width
-        for i in range(0, self.depth):
-            index = mmh3.hash(key, self.seed[i]) % self.width
-            if self.table[i, index] < min_est:
-                min_est = self.table[i, index]
-        return min_est
-
-    def merge(self, new_cms):
-        ''' Method to combine two count min sketches
-        @param new_cms CountMinSketch: Another CMS object
-        '''
-        return self.table + new_cms        
-
-def evaluate_cms(args, file_name):
-    seeds = np.random.randint(args.width, size=args.depth)
-    cms = CountMinSketch(args.width, args.depth, seeds=seeds)
-
+def evaluate_cms_single_key(cms, dataset, key, file_name):
     # read raw data (correct the path)
-    data_df = pd.read_csv(os.path.join(args.dataset, file_name))
-
+    data_df = pd.read_csv(os.path.join(dataset, file_name))
     unique_values = set()
     
     print("Populating CMS")
-    for _, series in tqdm(data_df.iterrows(), total=1e6):
-        value = ''.join([str(series[x]) for x in args.keys])
-        cms.increment(value)
+    for value in tqdm(data_df[key], total=1000000):
+        value_in_bytes = value.to_bytes(4, byteorder='big')
+        cms.increment(value_in_bytes)
         # also populate the unique set
-        unique_values.add(value)
+        unique_values.add(value_in_bytes)
 
     print("Creating Dictionary")
     countDictionary = defaultdict(lambda: 0)
-    for _, value in tqdm(data_df.iterrows(), total=1e6):
-        value = ''.join([str(series[x]) for x in args.keys])
-        countDictionary[value] += 1
+    for value in tqdm(data_df[key], total=1000000):
+        value_in_bytes = value.to_bytes(4, byteorder='big')
+        countDictionary[value_in_bytes] += 1
 
     print("Calculating CMS Error")
     errorSum, unique_value_count = 0, 0
-    for value in tqdm(unique_values):
-        error = abs(cms.estimate(value) - countDictionary[value]) / countDictionary[value]
+    for value_in_bytes in tqdm(unique_values):
+        # assert cms.get_min_count(value_in_bytes) == 0
+        # assert countDictionary[value_in_bytes] == 0
+        error = abs(cms.estimate(value_in_bytes) - countDictionary[value_in_bytes])
+        errorSum += error
+        unique_value_count += 1
+
+    real_error = errorSum / unique_value_count
+    return real_error
+
+
+def evaluate_cms_multiple_keys(cms, dataset, keys, file_name):
+    # read raw data (correct the path)
+    data_df = pd.read_csv(os.path.join(dataset, file_name))
+    # group the data by the keys
+    print("Grouping the Data Frame by keys")
+    grouped_data_df = data_df.groupby(keys)
+    unique_values = set()
+    
+    print("Populating CMS")
+    for _tuple, series in tqdm(grouped_data_df[keys]):
+        value_in_bytes = ''.join([str(x) for x in _tuple])
+        for _ in range(len(series)):
+            cms.increment(value_in_bytes)
+        # also populate the unique set
+        unique_values.add(value_in_bytes)
+
+    print("Creating Dictionary")
+    countDictionary = defaultdict(lambda: 0)
+    for _tuple, series in tqdm(grouped_data_df[keys]):
+        value_in_bytes = ''.join([str(x) for x in _tuple])
+        for _ in range(len(series)):
+            countDictionary[value_in_bytes] += 1
+
+    print("Calculating CMS Error")
+    errorSum, unique_value_count = 0, 0
+    for value_in_bytes in tqdm(unique_values):
+        # assert cms.get_min_count(value_in_bytes) == 0
+        # assert countDictionary[value_in_bytes] == 0
+        error = abs(cms.estimate(value_in_bytes) - countDictionary[value_in_bytes])
         errorSum += error
         unique_value_count += 1
 
@@ -91,16 +91,25 @@ def main():
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--dataset", type=str)
     CLI.add_argument("--keys", type=str, nargs='*')
+    CLI.add_argument("--hash", type=str)
     CLI.add_argument("--width", type=int)
     CLI.add_argument("--depth", type=int)
-    print(vars(CLI.parse_args()))
-        
-    # convert incoming args to a dictionary
     args = CLI.parse_args()
-    print("Evaluating real data..")
-    raw_error = evaluate_cms(args, file_name='raw.csv')
-    print("Evaluating synthetic data..")
-    syn_error = evaluate_cms(args, file_name='syn.csv')
+    print(vars(args))
+    
+    cms = CMS_COLLECTION[args.hash](args.width, args.depth)
+    
+    # convert incoming args to a dictionary
+    if len(args.keys) == 1:
+        print("Evaluating real data..")
+        raw_error = evaluate_cms_single_key(cms, args.dataset, key=args.keys[0], file_name='raw.csv')
+        print("Evaluating synthetic data..")
+        syn_error = evaluate_cms_single_key(cms, args.dataset, key=args.keys[0], file_name='syn.csv')
+    else:
+        print("Evaluating real data..")
+        raw_error = evaluate_cms_multiple_keys(cms, args.dataset, keys=args.keys, file_name='raw.csv')
+        print("Evaluating synthetic data..")
+        syn_error = evaluate_cms_multiple_keys(cms, args.dataset, keys=args.keys, file_name='syn.csv')
     print(f"Raw Error = {round(raw_error, 2)}")
     print(f"Syn Error = {round(syn_error, 2)}")
     relative_error = round(abs(syn_error - raw_error) / (1e-5 + raw_error) * 100, 2)
@@ -109,4 +118,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
