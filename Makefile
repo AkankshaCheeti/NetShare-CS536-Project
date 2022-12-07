@@ -3,8 +3,10 @@ export SUDO 						= echo $(USER_PASSWORD) | sudo -S
 export PROJECT_DIR 					= $(PWD)
 export SCRIPTS_DIR					= $(PROJECT_DIR)/scripts
 export SOURCE_DIR					= $(PROJECT_DIR)/src
+export EVAL_SOURCE_DIR				= $(PROJECT_DIR)/eval
 export PREPROCESSING_DIR			= $(PROJECT_DIR)/preprocess
 export RESULTS_DIR 					= $(PROJECT_DIR)/results
+export BACKUP_RESULTS_DIR 			= $(PROJECT_DIR)/backup_results
 
 export CONTAINER_WORK_DIR		 	= /workdir
 export CONTAINER_SCRIPTS_DIR		= $(CONTAINER_WORK_DIR)/scripts
@@ -21,6 +23,10 @@ export PYTHON_DOCKER				= $(SCRIPTS_DIR)/python3.6
 install-docker:
 	cd $(SCRIPTS_DIR) && $(SUDO) bash install-docker.sh
 
+########################################################################################
+################################### Preprocessing ######################################
+########################################################################################
+
 preprocess-no-dp:
 	cd $(PREPROCESSING_DIR) && bash run_no_privacy.sh
 
@@ -29,6 +35,10 @@ preprocess-no-dp-botnet-dataset:
 
 preprocess-with-dp:
 	cd $(PREPROCESSING_DIR) && bash run_privacy.sh
+
+########################################################################################
+################################### Train Models #######################################
+########################################################################################
 
 train-no-dp:
 	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
@@ -45,6 +55,15 @@ train-botnet-malicious-no-dp:
 		--config_file config_botnet_malicious_test_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --measurement
 
+# docker-train-no-dp:
+# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+# 		--config_file config_test1_pcap_no_dp \
+# 		--measurer_file measurers_localhost.ini --measurement"
+
+########################################################################################
+################################## Generate Flows ######################################
+########################################################################################
+
 generate-botnet-benign-no-dp:
 	cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
 		--config_file config_botnet_benign_test_pcap_no_dp \
@@ -60,17 +79,70 @@ generate-no-dp:
 		--config_file config_test1_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --generation
 
-# docker-train-no-dp:
-# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
-# 		--config_file config_test1_pcap_no_dp \
-# 		--measurer_file measurers_localhost.ini --measurement"
-
 # docker-generate-no-dp:
 # 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
 # 		--config_file config_test1_pcap_no_dp \
 # 		--measurer_file measurers_localhost.ini --generation"
 
+########################################################################################
+################################# Generate Results #####################################
+########################################################################################
+
+generate-caida-cdf:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
+		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--results $(BACKUP_RESULTS_DIR)/results/caida
+
+generate-ugr16-cdf:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
+		--type NETFLOW --dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+
+generate-botnet-malicious-cdf:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
+		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+		--results $(BACKUP_RESULTS_DIR)/results/botnet-malicious
+
+cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
+
+generate-ugr16-barplot:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
+		--method run_netflow_qualitative_plots \
+		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+
+barplots: generate-ugr16-barplot
+
+generate-caida-fidelity:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
+		--method run_pcap_dist_metrics \
+		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--results $(BACKUP_RESULTS_DIR)/results/caida
+
+generate-botnet-malicious-fidelity:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
+		--method run_pcap_dist_metrics \
+		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+		--results $(BACKUP_RESULTS_DIR)/results/botnet-malicious
+
+generate-ugr16-fidelity:
+	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
+		--method run_netflow_dist_metrics \
+		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+
+fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
+
+plots: cdf barplots fidelity
+
+########################################################################################
+############################## Clean Synthetic Flows ###################################
+########################################################################################
+
 clean-results:
-	rm -rf $(RESULTS_DIR)
+	-rm -rf $(RESULTS_DIR)
+
+clean-plots:
+	-rm -rf $(BACKUP_RESULTS_DIR)/results/*
 
 clean: clean-results

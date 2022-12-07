@@ -5,7 +5,7 @@ archive
 .vscode
 rsync*.sh
 results*/
-eval/
+# eval/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
