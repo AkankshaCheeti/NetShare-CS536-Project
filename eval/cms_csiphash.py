@@ -18,9 +18,9 @@ def positions(n_rows, n_columns, event):
         digest = csiphash.siphash24(struct.pack('QQ', row, n_columns), event)
         return np.fromstring(digest, dtype=np.uint64, count=1)[0]
     digest_array = np.array(list(map(digest_for_row, range(n_rows))))
-    # print(digest_array)
     bucket_array = np.true_divide(digest_array, np.uint64(2**64-1))
     column_array = np.trunc(n_columns * bucket_array).astype(np.uint64)
+    # print(column_array)
     return column_array
 
 
