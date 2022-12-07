@@ -91,17 +91,17 @@ generate-no-dp:
 generate-caida-cdf:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
 		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/caida/ \
-		--results $(BACKUP_RESULTS_DIR)/results/caida
+		--results $(BACKUP_RESULTS_DIR)/plots/caida
 
 generate-ugr16-cdf:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
 		--type NETFLOW --dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
-		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 generate-botnet-malicious-cdf:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_cdf.py \
 		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
-		--results $(BACKUP_RESULTS_DIR)/results/botnet-malicious
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
 
 cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
 
@@ -109,7 +109,7 @@ generate-ugr16-barplot:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
 		--method run_netflow_qualitative_plots \
 		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
-		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 barplots: generate-ugr16-barplot
 
@@ -117,19 +117,19 @@ generate-caida-fidelity:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
 		--method run_pcap_dist_metrics \
 		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
-		--results $(BACKUP_RESULTS_DIR)/results/caida
+		--results $(BACKUP_RESULTS_DIR)/plots/caida
 
 generate-botnet-malicious-fidelity:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
 		--method run_pcap_dist_metrics \
 		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
-		--results $(BACKUP_RESULTS_DIR)/results/botnet-malicious
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
 
 generate-ugr16-fidelity:
 	cd $(EVAL_SOURCE_DIR) && $(PYTHON) plot_bar_plot.py \
 		--method run_netflow_dist_metrics \
 		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
-		--results $(BACKUP_RESULTS_DIR)/results/ugr16
+		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
 
@@ -143,6 +143,6 @@ clean-results:
 	-rm -rf $(RESULTS_DIR)
 
 clean-plots:
-	-rm -rf $(BACKUP_RESULTS_DIR)/results/*
+	-rm -rf $(BACKUP_RESULTS_DIR)/plots/*
 
 clean: clean-results
