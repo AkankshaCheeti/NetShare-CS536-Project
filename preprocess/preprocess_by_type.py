@@ -34,7 +34,7 @@ def IPs_str2int(IPs_str):
 def df2epochs(big_raw_df, file_type="PCAP", split_type="fixed_size", n_instances=10, eps=1e-5):
     if file_type == "PCAP":
         time_col_name = "time"
-    elif file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON":
+    elif file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON" or file_type == "BOTNET_FLOW":
         time_col_name = "ts"
     
     # sanity sort
@@ -85,7 +85,7 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
         else:
             fields["time"].min_x = float(df_per_epoch["time"].min())
             fields["time"].max_x = float(df_per_epoch["time"].max())
-    elif args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON":
+    elif args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON" or args.file_type == "BOTNET_FLOW":
         if args.netflow_interarrival == True:
             gk = df_per_epoch.groupby(["srcip", "dstip", "srcport", "dstport", "proto"])
             flow_start_list = []
@@ -149,7 +149,7 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
         if file_type == "PCAP" and args.pcap_interarrival == True:
             attr_per_row.append(fields["flow_start"].normalize(df_group.iloc[0]["time"]))
         
-        if (file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON") and args.netflow_interarrival == True:
+        if (file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON" or file_type == "BOTNET_FLOW") and args.netflow_interarrival == True:
             attr_per_row.append(fields["flow_start"].normalize(df_group.iloc[0]["ts"]))
 
         # cross-epoch generation
@@ -185,7 +185,7 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
         # measurement
         if file_type == "PCAP" and args.pcap_interarrival == True:
             interarrival_per_flow_list = [0.0] + list(np.diff(df_group["time"]))
-        if (file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON") and args.netflow_interarrival == True:
+        if (file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON" or file_type == "BOTNET_FLOW") and args.netflow_interarrival == True:
             interarrival_per_flow_list = [0.0] + list(np.diff(df_group["ts"]))
 
         for row_index, row in df_group.iterrows():
@@ -203,7 +203,7 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
                         else:
                             timeseries_per_step.append(field_normalize)
             
-            elif file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON":
+            elif file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON" or file_type == "BOTNET_FLOW":
                 if args.netflow_interarrival == True:
                     timeseries_per_step = [fields["interarrival_within_flow"].normalize(interarrival_per_flow_list[row_index]), row["td"]]
                 else:
@@ -276,7 +276,7 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
             else:
                 data_feature_output.append(field_output)
     
-    if file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON":
+    if file_type == "UGR16" or file_type == "CIDDS" or file_type == "TON" or file_type == "BOTNET_FLOW":
         if args.netflow_interarrival == True:
             field_list = ["interarrival_within_flow"]
         else:
@@ -284,8 +284,10 @@ def split_per_epoch(args, fields, df_per_epoch, embed_model, global_max_flow_len
 
         if file_type == "UGR16":
             field_list += ["td", "pkt", "byt", "type"]
-        else:
+        elif file_type == "CIDDS" or file_type == "TON":
             field_list += ["td", "pkt", "byt", "label", "type"]
+        else: # BOTNET_FLOW
+            field_list += ["td", "pkt", "byt", "label", "type", "NumberOfPackets", "TotalBytesTransmitted", "MedianIPT", "ConversationDuration", "l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11", "l12", "l13", "l14", "l15", "l16", "l17", "l18", "l19", "l20", "l21", "l22", "l23", "i1", "i2", "i3", "i4", "i5", "i6", "i7"]
 
         for field in field_list:
             field_output = fields[field].getOutputType()
@@ -305,12 +307,46 @@ def main(args):
     df = pd.read_csv(os.path.join(args.src_dir, args.src_csv))
 
     # log-transform raw data
-    if args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON":
+    if args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON" or args.file_type == "BOTNET_FLOW":
         df["td"] = np.log(1+df["td"])
         df["pkt"] = np.log(1+df["pkt"])
         df["byt"] = np.log(1+df["byt"])
-
-
+    
+    if args.file_type == "BOTNET_FLOW":
+        df["NumberOfPackets"] = np.log(1+df["NumberOfPackets"])
+        df["TotalBytesTransmitted"] = np.log(1+df["TotalBytesTransmitted"])
+        df["MedianIPT"] = np.log(1+df["MedianIPT"])
+        df["ConversationDuration"] = np.log(1+df["ConversationDuration"])
+        df["l1"] = np.log(1+df["l1"])
+        df["l2"] = np.log(1+df["l2"])
+        df["l3"] = np.log(1+df["l3"])
+        df["l4"] = np.log(1+df["l4"])
+        df["l5"] = np.log(1+df["l5"])
+        df["l6"] = np.log(1+df["l6"])
+        df["l7"] = np.log(1+df["l7"])
+        df["l8"] = np.log(1+df["l8"])
+        df["l9"] = np.log(1+df["l9"])
+        df["l10"] = np.log(1+df["l10"])
+        df["l11"] = np.log(1+df["l11"])
+        df["l12"] = np.log(1+df["l12"])
+        df["l13"] = np.log(1+df["l13"])
+        df["l14"] = np.log(1+df["l14"])
+        df["l15"] = np.log(1+df["l15"])
+        df["l16"] = np.log(1+df["l16"])
+        df["l17"] = np.log(1+df["l17"])
+        df["l18"] = np.log(1+df["l18"])
+        df["l19"] = np.log(1+df["l19"])
+        df["l20"] = np.log(1+df["l20"])
+        df["l21"] = np.log(1+df["l21"])
+        df["l22"] = np.log(1+df["l22"])
+        df["l23"] = np.log(1+df["l23"])
+        df["i1"] = np.log(1+df["i1"])
+        df["i2"] = np.log(1+df["i2"])
+        df["i3"] = np.log(1+df["i3"])
+        df["i4"] = np.log(1+df["i4"])
+        df["i5"] = np.log(1+df["i5"])
+        df["i6"] = np.log(1+df["i6"])
+        df["i7"] = np.log(1+df["i7"])
 
     embed_model = Word2Vec.load(os.path.join(args.src_dir, "word2vec_vecSize_{}.model".format(args.word2vec_vecSize)))
     print("Processing dataset {} ...".format(args.src_dir))
@@ -460,7 +496,7 @@ def main(args):
                 norm_option=NORM_OPTION
             )
     
-    if args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON":
+    if args.file_type == "UGR16" or args.file_type == "CIDDS" or args.file_type == "TON" or args.file_type == "BOTNET_FLOW":
         if args.netflow_interarrival == True:
             fields["flow_start"] = ContinuousField(
                 name="flow_start",
