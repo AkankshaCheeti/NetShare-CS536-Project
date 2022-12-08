@@ -175,11 +175,29 @@ HASH						?= csiphash # mmh3, horner
 DEPTH						?= 5
 PERCENTILE					?= 0.1
 
-generate-caida-cms:
+generate-caida-cms-dstip:
 	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
 		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
 		--results $(BACKUP_RESULTS_DIR)/plots/caida/ \
 		--keys dstip \
+		--hash $(HASH) \
+		--width_scales 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 \
+		--depth $(DEPTH) --percentile $(PERCENTILE)
+
+generate-caida-cms-srcip:
+	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/caida/ \
+		--keys srcip \
+		--hash $(HASH) \
+		--width_scales 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 \
+		--depth $(DEPTH) --percentile $(PERCENTILE)
+
+generate-caida-cms-5tuple:
+	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/caida/ \
+		--keys srcip dstip srcport dstport proto \
 		--hash $(HASH) \
 		--width_scales 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 \
 		--depth $(DEPTH) --percentile $(PERCENTILE)

@@ -218,11 +218,12 @@ def main():
                                                 keys=args.keys, 
                                                 heavy_hitter_percentile=args.percentile, 
                                                 file_name='syn.csv')
+        
         print(f"Raw Error = {round(raw_error, 2)}")
         print(f"Syn Error = {round(syn_error, 2)}")
         raw_errors.append(raw_error)
         syn_errors.append(syn_error)
-        
+                
         if raw_error == 0:
             relative_error = round(abs(syn_error - raw_error) * 100, 2)
         elif raw_error > syn_error:
@@ -243,7 +244,7 @@ def main():
     plt.ylabel("Error %", fontsize=16)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
-    plot_name = "cms_line_{}_top_{}%.jpg".format(args.hash, args.percentile)
+    plot_name = "cms_line_{}_{}_top_{}%.jpg".format(args.hash, '-'.join(args.keys), args.percentile)
     plt.savefig(os.path.join(args.results, plot_name), bbox_inches="tight", dpi=300)
 
 
