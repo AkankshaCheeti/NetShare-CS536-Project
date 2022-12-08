@@ -115,7 +115,7 @@ def evaluate_cms_multiple_keys(dataset, cms_hash_function, cms_width_scale, cms_
         cms = CMS_COLLECTION[cms_hash_function](cms_width, cms_depth)
     
     print("Populating CMS")
-    for _tuple, series in tqdm(grouped_data_df[keys], len(unique_values)):
+    for _tuple, series in tqdm(grouped_data_df[keys]):
         value_in_bytes = ''.join([str(x) for x in _tuple]).encode()
         for _ in range(len(series)):
             cms.increment(value_in_bytes)
@@ -130,7 +130,7 @@ def evaluate_cms_multiple_keys(dataset, cms_hash_function, cms_width_scale, cms_
 
     print("Creating All-bins Dictionary")
     countDictionary = defaultdict(lambda: 0)
-    for _tuple, series in tqdm(grouped_data_df[keys], len(unique_values)):
+    for _tuple, series in tqdm(grouped_data_df[keys]):
         value_in_bytes = ''.join([str(x) for x in _tuple]).encode()
         for _ in range(len(series)):
             countDictionary[value_in_bytes] += 1
@@ -204,20 +204,20 @@ def main():
         else:
             print("Evaluating real data with multiple keys..")
             raw_error = evaluate_cms_multiple_keys(dataset=args.dataset, 
-                                                cms_hash_function=args.hash, 
-                                                cms_width_scale=width_scale, 
-                                                cms_depth=args.depth, 
-                                                keys=args.keys, 
-                                                heavy_hitter_percentile=args.percentile, 
-                                                file_name='raw.csv')
+                                                   cms_hash_function=args.hash, 
+                                                   cms_width_scale=width_scale, 
+                                                   cms_depth=args.depth, 
+                                                   keys=args.keys, 
+                                                   heavy_hitter_percentile=args.percentile, 
+                                                   file_name='raw.csv')
             print("Evaluating synthetic data with multiple keys..")
             syn_error = evaluate_cms_multiple_keys(dataset=args.dataset, 
-                                                cms_hash_function=args.hash, 
-                                                cms_width_scale=width_scale, 
-                                                cms_depth=args.depth, 
-                                                keys=args.keys, 
-                                                heavy_hitter_percentile=args.percentile, 
-                                                file_name='syn.csv')
+                                                   cms_hash_function=args.hash, 
+                                                   cms_width_scale=width_scale, 
+                                                   cms_depth=args.depth, 
+                                                   keys=args.keys, 
+                                                   heavy_hitter_percentile=args.percentile, 
+                                                   file_name='syn.csv')
         
         print(f"Raw Error = {round(raw_error, 2)}")
         print(f"Syn Error = {round(syn_error, 2)}")
