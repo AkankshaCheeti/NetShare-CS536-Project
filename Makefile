@@ -106,7 +106,7 @@ generate-botnet-malicious-cdf:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py --type PCAP \
 		--raw_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-raw.csv \
 		--syn_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-syn.csv \
-		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet
 
 cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
 
@@ -135,7 +135,7 @@ generate-botnet-malicious-fidelity:
 		--method run_pcap_dist_metrics \
 		--raw_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-raw.csv \
 		--syn_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-syn.csv \
-		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet
 
 generate-ugr16-fidelity:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_bar_plot.py \
@@ -145,10 +145,6 @@ generate-ugr16-fidelity:
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
-
-#################################### All Plots ########################################
-
-plots: cdf barplots fidelity
 
 ################################# Count-Min Sketch ####################################
 
@@ -171,15 +167,25 @@ generate-botnet-malicious-cms:
 
 ################################## ML Evaluations #####################################
 
-RUNS						?= 
+RUNS						?= 10
 
 anomaly-ugr16:
 	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) ugr16_anomaly.py \
-		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ --runs $(RUNS)
+		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/ugr16/ \
+		--runs $(RUNS)
 
 anomaly-botnet:
 	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) botnet_anomaly.py \
-		--dataset $(BACKUP_RESULTS_DIR)/botnet/ --runs $(RUNS)
+		--dataset $(BACKUP_RESULTS_DIR)/botnet/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet \
+		--runs $(RUNS)
+
+anomaly: anomaly-ugr16 anomaly-botnet
+
+#################################### All Plots ########################################
+
+plots: cdf barplots fidelity anomaly
 
 ########################################################################################
 ############################## Clean Synthetic Flows ###################################

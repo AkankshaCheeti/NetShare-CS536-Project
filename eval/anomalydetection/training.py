@@ -32,14 +32,15 @@ def train_models(X_train_s, Y_train_s, X_test_s, Y_test_s):
             RandomForestClassifier, 
             AdaBoostClassifier, 
             MLPClassifier]
-    models_names = ['Logistic Regression', 
-                    'XGBClassifier', 
-                    'LGBMClassifier', 
-                    'Gaussian Naive Bayes',
-                    'Decision Tree', 
-                    'Random Forest', 
-                    'AdaBoost', 
-                    'MLPClassifier']
+    # models_names = ['Logistic Regression', 
+    #                 'XGBClassifier', 
+    #                 'LGBMClassifier', 
+    #                 'Gaussian Naive Bayes',
+    #                 'Decision Tree', 
+    #                 'Random Forest', 
+    #                 'AdaBoost', 
+    #                 'MLPClassifier']
+    models_names = ['LR', 'XG', 'LG', 'NB', 'DT', 'RF', 'AB', 'NN']
     models_type = ['ML' for x in models]
     models_params = [{} for x in models]
 

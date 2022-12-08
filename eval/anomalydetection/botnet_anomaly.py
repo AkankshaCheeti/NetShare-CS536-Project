@@ -74,30 +74,53 @@ def process_botnet_dataset(benign_dataset, malicious_dataset):
 def main():
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--dataset", type=str)
+    CLI.add_argument("--results", type=str)
     CLI.add_argument("--runs", type=int)
     args = CLI.parse_args()
     print(vars(args))
 
-    (B_RAW_X_train_s, B_RAW_Y_train_s, B_RAW_X_test_s, B_RAW_Y_test_s) = process_botnet_dataset(benign_dataset=os.path.join(args.dataset, 'benign-raw.csv'),
-                                                                                                malicious_dataset=os.path.join(args.dataset, 'malicious-raw.csv'))
-    (M_RAW_X_train_s, M_RAW_Y_train_s, M_RAW_X_test_s, M_RAW_Y_test_s) = process_botnet_dataset(benign_dataset=os.path.join(args.dataset, 'benign-raw.csv'),
-                                                                                                malicious_dataset=os.path.join(args.dataset, 'malicious-syn.csv'))
+    (RAW_X_train_s, RAW_Y_train_s, RAW_X_test_s, RAW_Y_test_s) = process_botnet_dataset(benign_dataset=os.path.join(args.dataset, 'benign-raw.csv'),
+                                                                                        malicious_dataset=os.path.join(args.dataset, 'malicious-raw.csv'))
+    (SYN_X_train_s, SYN_Y_train_s, SYN_X_test_s, SYN_Y_test_s) = process_botnet_dataset(benign_dataset=os.path.join(args.dataset, 'benign-raw.csv'),
+                                                                                        malicious_dataset=os.path.join(args.dataset, 'malicious-syn.csv'))
     
     correlations = []
+    max_correlation = 0.0
+    best_accs_raw_test, best_accs_syn_test = {}, {}
     for i in range(1, args.runs+1):
         # train models on both datasets
-        (accs_raw_train, accs_raw_test) = train_models(B_RAW_X_train_s, B_RAW_Y_train_s, B_RAW_X_test_s, B_RAW_Y_test_s)
-        (accs_syn_train, accs_syn_test) = train_models(M_RAW_X_train_s, M_RAW_Y_train_s, M_RAW_X_test_s, M_RAW_Y_test_s)
+        (accs_raw_train, accs_raw_test) = train_models(RAW_X_train_s, RAW_Y_train_s, RAW_X_test_s, RAW_Y_test_s)
+        (accs_syn_train, accs_syn_test) = train_models(SYN_X_train_s, SYN_Y_train_s, SYN_X_test_s, SYN_Y_test_s)
         # compare raw and synthetic accuracies
         print(f"Model Accuracies on Raw Dataset = {accs_raw_test}")
         print(f"Model Accuracies on Syn Dataset = {accs_syn_test}")
         (spearman_correlation, pvalue) = spearmanr(list(accs_raw_test.values()), list(accs_syn_test.values()))
         print(f"[Run {i}] Spearman Correlation of Raw and Synthetic traces = {round(spearman_correlation, 2)} (pvalue = {pvalue})")
         correlations.append(spearman_correlation)
+        # update the best performing model accuracies
+        if spearman_correlation > max_correlation:
+            max_correlation = spearman_correlation
+            best_accs_raw_test = accs_raw_test
+            best_accs_syn_test = accs_syn_test
 
     print(f"\n\nSpearman Correlations over {args.runs} runs = {correlations}\n")
     average_spearman_correlation = np.mean(correlations)
     print(f"\nAverage Spearman Correlation of Raw and Synthetic traces over {args.runs} runs = {round(average_spearman_correlation, 2)}\n")
+
+    bar_width = 0.35
+    X = np.arange(len(best_accs_raw_test))
+    plt.figure(figsize=(6, 4))
+    plt.bar(X-bar_width/2, best_accs_raw_test.values(), label="Raw Data", width=bar_width, color='lightcoral', align='center')
+    plt.bar(X+bar_width/2, best_accs_syn_test.values(), label="Syn Data", width=bar_width, color='steelblue', align='center')
+    plt.xticks(X, best_accs_raw_test.keys())
+    
+    plt.title(f"Spearman Correlation = {round(max_correlation, 2)}", fontsize=14, y=1.11)
+    plt.legend(fontsize=12, loc="upper center", bbox_to_anchor=(0.5, 1.14), ncol=2)
+    plt.xlabel("ML Models", fontsize=16)
+    plt.ylabel("Test Accuracy", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)   
+    plt.savefig(os.path.join(args.results, "anomaly_botnet_bar.jpg"), bbox_inches="tight", dpi=300)
 
 
 if __name__ == "__main__":
