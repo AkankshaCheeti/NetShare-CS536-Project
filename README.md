@@ -2,6 +2,8 @@
 
 **Class Project:** [Akanksha Cheeti] [Annus Zulfiqar] [Ashwin Nambiar] [Syed Hasan Amin] [Murayyiam Parvez] [Syed Muhammed Abubaker]
 
+[[Insert class project slides](link)][[Insert class project report](link)]
+
 [[paper (SIGCOMM 2022)](https://dl.acm.org/doi/abs/10.1145/3544216.3544251)][[talk (SIGCOMM 2022)](https://www.youtube.com/watch?v=mWnFIncjtWg)][[web service demo](https://drive.google.com/file/d/1vPuneEb14A2w7fKyCJ41NAHzsvpLQP5H/view)]
 
 **Authors:** [[Yucheng Yin](https://sniperyyc.com/)] [[Zinan Lin](http://www.andrew.cmu.edu/user/zinanl/)] [[Minhao Jin](https://www.linkedin.com/in/minhao-jin-1328b8164/)] [[Giulia Fanti](https://www.andrew.cmu.edu/user/gfanti/)] [[Vyas Sekar](https://users.ece.cmu.edu/~vsekar/)]
