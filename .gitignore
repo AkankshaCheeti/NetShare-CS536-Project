@@ -5,7 +5,7 @@ archive
 .vscode
 rsync*.sh
 results*/
-plots/
+plots/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
