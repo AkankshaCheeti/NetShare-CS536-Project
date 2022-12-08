@@ -146,25 +146,6 @@ generate-ugr16-fidelity:
 
 fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
 
-################################# Count-Min Sketch ####################################
-
-HASH						?= csiphash # mmh3, horner
-WIDTH_SCALE					?= 0.1
-DEPTH						?= 5
-PERCENTILE					?= 0.1
-
-generate-caida-cms:
-	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
-		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
-		--keys srcip --hash $(HASH) \
-		--width_scale $(WIDTH_SCALE) --depth $(DEPTH) --percentile $(PERCENTILE)
-
-generate-botnet-malicious-cms:
-	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
-		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
-		--keys srcip dstip srcport dstport proto --hash $(HASH) \
-		--width 10000 --depth 5 --percentile $(PERCENTILE)
-
 ################################## ML Evaluations #####################################
 
 RUNS						?= 10
@@ -186,6 +167,27 @@ anomaly: anomaly-ugr16 anomaly-botnet
 #################################### All Plots ########################################
 
 plots: cdf barplots fidelity anomaly
+
+################################# Count-Min Sketch ####################################
+
+HASH						?= csiphash # mmh3, horner
+WIDTH_SCALE					?= 0.4
+DEPTH						?= 5
+PERCENTILE					?= 0.1
+
+generate-caida-cms:
+	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/caida/ \
+		--keys srcip --hash $(HASH) \
+		--width_scale $(WIDTH_SCALE) --depth $(DEPTH) --percentile $(PERCENTILE)
+
+generate-botnet-malicious-cms:
+	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/botnet/ \
+		--results $(BACKUP_RESULTS_DIR)/plots/botnet/ \
+		--keys srcip dstip srcport dstport proto --hash $(HASH) \
+		--width 10000 --depth 5 --percentile $(PERCENTILE)
 
 ########################################################################################
 ############################## Clean Synthetic Flows ###################################
