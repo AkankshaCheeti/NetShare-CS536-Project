@@ -111,8 +111,8 @@ def main():
         print(f"Model Accuracies on Syn Dataset = {accs_syn_test}")
         # compare raw and synthetic accuracies
         (spearman_correlation, pvalue) = spearmanr(list(accs_raw_test.values()), list(accs_syn_test.values()))
-        correlations.append(spearman_correlation)
         print(f"[Run {i}] Spearman Correlation of Raw and Synthetic traces = {round(spearman_correlation, 2)} (pvalue = {pvalue})")
+        correlations.append(spearman_correlation)
 
     print(f"\n\nSpearman Correlations over {args.runs} runs = {correlations}\n")
     average_spearman_correlation = np.mean(correlations)
