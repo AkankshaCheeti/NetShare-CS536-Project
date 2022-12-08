@@ -114,7 +114,7 @@ def evaluate_cms_multiple_keys(dataset, cms_hash_function, cms_width_scale, cms_
         cms = CMS_COLLECTION[cms_hash_function](cms_width, cms_depth)
     
     print("Populating CMS")
-    for _tuple, series in tqdm(grouped_data_df[keys]):
+    for _tuple, series in tqdm(grouped_data_df[keys], len(unique_values)):
         value_in_bytes = ''.join([str(x) for x in _tuple]).encode()
         for _ in range(len(series)):
             cms.increment(value_in_bytes)
@@ -129,7 +129,7 @@ def evaluate_cms_multiple_keys(dataset, cms_hash_function, cms_width_scale, cms_
 
     print("Creating All-bins Dictionary")
     countDictionary = defaultdict(lambda: 0)
-    for _tuple, series in tqdm(grouped_data_df[keys]):
+    for _tuple, series in tqdm(grouped_data_df[keys], len(unique_values)):
         value_in_bytes = ''.join([str(x) for x in _tuple]).encode()
         for _ in range(len(series)):
             countDictionary[value_in_bytes] += 1

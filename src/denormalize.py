@@ -18,7 +18,6 @@ from gensim.models import Word2Vec
 from collections import Counter, OrderedDict
 import statsmodels.api as sm
 
-sys.path.append("../preprocess")
 from embedding_helper import build_annoy_dictionary_word2vec, get_original_obj
 
 random.seed(42)

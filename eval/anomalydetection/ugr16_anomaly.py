@@ -1,0 +1,115 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+from scipy.stats import spearmanr
+import argparse
+import os
+
+from encoding import encode_categorical
+from training import train_models
+
+
+def process_ugr16_dataset(dataset):
+    df = pd.read_csv(dataset)
+    # df.head()
+
+    N1 = 2500
+    testset_size = 0.2
+
+    target = 'type'
+    # cat_cols = ['srcip', 'dstip', 'srcport', 'dstport', 'proto']
+    cat_cols = ['srcport', 'dstport', 'proto']
+    cont_cols = ['ts', 'td', 'pkt', 'byt']
+
+    scale_X = True
+    enc_type = 'label'
+
+    if N1 > df['type'].value_counts()['blacklist']:
+        N1 = df['type'].value_counts()['blacklist']
+
+    # keep ixs unchanged across raw, syn (imp), sim (not as imp)?
+    ixs_0 = np.where(df['type'] == 'background')[0]
+    ixs_1 = np.where(df['type'] == 'blacklist')[0]
+    ixs_0 = np.random.choice(ixs_0, N1, replace=False)
+    ixs_1 = np.random.choice(ixs_1, N1, replace=False)
+    df_new = df.iloc[np.concatenate([ixs_0, ixs_1]), :].copy()
+
+    df_train, df_test = train_test_split(df_new, test_size=testset_size)
+
+    smalls_threshold = 0.001
+
+    # everything not in large would be converted to smalls
+    # computationally efficient and helps cater for unseen values
+    large_dict = {}
+    for field in cat_cols:
+        large_dict_curr = {k:v for (k,v) in df_train[field].value_counts(normalize=True).items() if v>=smalls_threshold}
+        df_train.loc[~df_train[field].isin(large_dict_curr.keys()), field] = 'smalls'
+        large_dict[field] = large_dict_curr
+
+    # smalls mapping on test data (can do this in loop above but would not be able to replicate it in production)
+    for field in list(large_dict.keys()):
+        df_test.loc[~df_test[field].isin(large_dict[field].keys()), field] = 'smalls'
+        
+    # scale continuous features and encode categorical features
+    if scale_X:
+        scaler_X_cont = StandardScaler()
+        scaler_X_cont_emb = StandardScaler()
+        X_train_cont_s = scaler_X_cont.fit_transform(df_train[cont_cols])
+        X_test_cont_s = scaler_X_cont.transform(df_test[cont_cols])
+    else:
+        X_train_cont_s = df_train[cont_cols]
+        X_test_cont_s = df_test[cont_cols]
+        
+    X_train_cat_s, enc_cat = encode_categorical(df_train[cat_cols], enc_type)
+    X_train_cat_s = np.array(X_train_cat_s)
+    X_test_cat_s = enc_cat.transform(df_test[cat_cols])
+    X_test_cat_s = np.array(X_test_cat_s)
+
+    X_train_s = np.concatenate((X_train_cont_s, X_train_cat_s), axis=1)
+    X_test_s = np.concatenate((X_test_cont_s, X_test_cat_s), axis=1)
+
+    Y_train = df_train[target].copy().values
+    Y_test = df_test[target].copy().values
+
+    Y_train_s = (Y_train == 'blacklist').astype('int')
+    Y_test_s = (Y_test == 'blacklist').astype('int')
+
+    print(f"X_train Size = {X_train_s.shape}, X_test Size = {X_test_s.shape}, Y_train Size = {Y_train_s.shape}, Y_test Size = {Y_test_s.shape}")
+
+    # check data imbalance
+    ratio_1_0_train = sum(Y_train_s == 1) / sum(Y_train_s == 0)
+    ratio_1_0_test = sum(Y_test_s == 1) / sum(Y_test_s == 0)
+    print(f"Train 1/0 Split = {ratio_1_0_train}; Test 1/0 Split = {ratio_1_0_test}")
+
+    return (X_train_s, Y_train_s, X_test_s, Y_test_s)
+
+
+def main():
+    CLI = argparse.ArgumentParser()
+    CLI.add_argument("--dataset", type=str)
+    args = CLI.parse_args()
+    print(vars(args))
+    
+    # process the raw dataset
+    (X_train_s, Y_train_s, X_test_s, Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'raw.csv'))
+    (accs_raw_train, accs_raw_test) = train_models(X_train_s, Y_train_s, X_test_s, Y_test_s)
+
+    # process the synthetic dataset
+    (X_train_s, Y_train_s, X_test_s, Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'syn.csv'))
+    (accs_syn_train, accs_syn_test) = train_models(X_train_s, Y_train_s, X_test_s, Y_test_s)
+
+    # compare raw and synthetic accuracies
+    (spearman_correlation, pvalue) = spearmanr(list(accs_raw_test.values()), list(accs_syn_test.values()))
+
+    print(f"Spearman Correlation of Raw and Synthetic traces = {round(spearman_correlation, 2)} (pvalue = {pvalue})")
+
+
+if __name__ == "__main__":
+    main()

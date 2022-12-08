@@ -52,7 +52,6 @@ from collections import Counter, OrderedDict
 from scipy.stats import wasserstein_distance
 from scipy.spatial import distance
 
-sys.path.append("../preprocess")
 from field import *
 from output import *
 from embedding_helper import build_annoy_dictionary_word2vec, get_original_obj
