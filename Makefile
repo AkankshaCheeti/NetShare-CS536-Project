@@ -171,7 +171,7 @@ plots: cdf barplots fidelity anomaly
 ################################# Count-Min Sketch ####################################
 
 HASH						?= csiphash # mmh3, horner
-WIDTH_SCALE					?= 0.4
+# WIDTH_SCALE					?= 0.4
 DEPTH						?= 5
 PERCENTILE					?= 0.1
 
@@ -179,15 +179,19 @@ generate-caida-cms:
 	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
 		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
 		--results $(BACKUP_RESULTS_DIR)/plots/caida/ \
-		--keys srcip --hash $(HASH) \
-		--width_scale $(WIDTH_SCALE) --depth $(DEPTH) --percentile $(PERCENTILE)
+		--keys dstip \
+		--hash $(HASH) \
+		--width_scales 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 \
+		--depth $(DEPTH) --percentile $(PERCENTILE)
 
 generate-botnet-malicious-cms:
 	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
 		--dataset $(BACKUP_RESULTS_DIR)/botnet/ \
 		--results $(BACKUP_RESULTS_DIR)/plots/botnet/ \
-		--keys srcip dstip srcport dstport proto --hash $(HASH) \
-		--width 10000 --depth 5 --percentile $(PERCENTILE)
+		--keys dstip \
+		--hash $(HASH) \
+		--width_scales 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 \
+		--depth $(DEPTH) --percentile $(PERCENTILE)
 
 ########################################################################################
 ############################## Clean Synthetic Flows ###################################

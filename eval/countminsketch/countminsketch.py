@@ -174,17 +174,15 @@ def main():
     CLI.add_argument("--results", type=str)
     CLI.add_argument("--keys", type=str, nargs='*')
     CLI.add_argument("--hash", type=str)
-    CLI.add_argument("--width_scale", type=float)
+    CLI.add_argument("--width_scales", type=float, nargs='*')
     CLI.add_argument("--depth", type=int)
     CLI.add_argument("--percentile", type=float)
     args = CLI.parse_args()
     print(vars(args))
     
-    width_scales, raw_errors, syn_errors = [], [], []
-    for width_scale in range(1, 10):
+    raw_errors, syn_errors = [], []
+    for width_scale in args.width_scales:
         # convert incoming args to a dictionary
-        width_scale /= 10
-        width_scales.append(width_scale)
         print(f"\n[Run {width_scale}] Using Width Scale = {width_scale}")
         if len(args.keys) == 1:
             print("Evaluating real data with a single key..")
@@ -222,8 +220,9 @@ def main():
                                                 file_name='syn.csv')
         print(f"Raw Error = {round(raw_error, 2)}")
         print(f"Syn Error = {round(syn_error, 2)}")
-        raw_errors.append(random.randint(1, 10)/10)
-        syn_errors.append(random.randint(1, 10)/10)
+        raw_errors.append(raw_error)
+        syn_errors.append(syn_error)
+        
         if raw_error == 0:
             relative_error = round(abs(syn_error - raw_error) * 100, 2)
         elif raw_error > syn_error:
@@ -232,18 +231,20 @@ def main():
             relative_error = round(abs(syn_error - raw_error) * 100 / raw_error, 2)
         print(f"Relative Error = {relative_error}%")
 
-    print(raw_errors)
-    print(syn_errors)
+    print("Width Scales = ", args.width_scales)
+    print("Raw Errors = ", raw_errors)
+    print("Syn Errors = ", syn_errors)
     
-    plt.plot(width_scales, raw_errors, 'bo-', label ='Raw Errors')
-    plt.plot(width_scales, syn_errors, 'ro-', label ='Syn Errors')
+    plt.plot(args.width_scales, raw_errors, 'bo-', label ='Raw Errors')
+    plt.plot(args.width_scales, syn_errors, 'ro-', label ='Syn Errors')
     
     plt.legend(fontsize=12, loc="upper right")
     plt.xlabel("Width Scale", fontsize=16)
     plt.ylabel("Error %", fontsize=16)
     plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)   
-    plt.savefig(os.path.join(args.results, "cms_line_plot.jpg"), bbox_inches="tight", dpi=300)
+    plt.yticks(fontsize=14)
+    plot_name = "cms_line_{}_top_{}%.jpg".format(args.hash, args.percentile)
+    plt.savefig(os.path.join(args.results, plot_name), bbox_inches="tight", dpi=300)
 
 
 if __name__ == '__main__':
