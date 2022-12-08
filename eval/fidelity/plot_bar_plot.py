@@ -159,11 +159,11 @@ def plot_bar_port(real_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logs
     
     if metric == "srcport" or metric == "dstport":
         print("here")
-        fig, axs = plt.subplots(len(syn_df_dict), 1, figsize=(8, 10))
+        fig, axs = plt.subplots(len(syn_df_dict), 1, figsize=(6, 4))
         #fig, axs = plt.subplots()
         bar_width = 0.4
     elif metric == "proto":
-        fig, axs = plt.subplots(len(syn_df_dict), 1, figsize=(6, 5))
+        fig, axs = plt.subplots(len(syn_df_dict), 1, figsize=(6, 4))
         bar_width = 0.2
     print("printing axs")
     subplot_idx = 0
@@ -220,14 +220,21 @@ def plot_bar_port(real_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logs
 
         # ax.set_xlabel(xlabel, fontsize=14)
         # ax.set_ylabel(ylabel, fontsize=14)
+        
+        plt.xlabel(xlabel, fontsize=14)
+        plt.ylabel(ylabel, fontsize=14)
+        # plt.legend(fontsize=18)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        
         ax.legend(fontsize=15, loc="upper right")
         if x_logscale:
             ax.set_xscale('log')
         if y_logscale:
             ax.set_yscale('log')
     
-    fig.text(0.5,0.03, xlabel, ha="center", va="center", fontsize=24)
-    fig.text(0.05,0.5, ylabel, ha="center", va="center", fontsize=24, rotation=90)
+    # fig.text(0.5,0.03, xlabel, ha="center", va="center", fontsize=24)
+    # fig.text(0.05,0.5, ylabel, ha="center", va="center", fontsize=24, rotation=90)
         
     plt.savefig(plot_loc, bbox_inches="tight", dpi=300)
     
@@ -564,15 +571,14 @@ def compute_metrics_pcap_v3(raw_df, syn_df):
 
 
 def run_netflow_dist_metrics(args):
-    raw_df = pd.read_csv(os.path.join(args.dataset, "raw.csv"))
+    raw_df = pd.read_csv(args.raw_dataset)
     print(raw_df)
     
     meta_metric_dict_netflow = {}
     meta_metric_dict_netflow["NetShare"] = {}
-    syn_df_file = os.path.join(args.dataset, "syn.csv")
 
-    syn_df = pd.read_csv(syn_df_file)
-    print(args.dataset, args.results)
+    syn_df = pd.read_csv(args.syn_dataset)
+    # print(args.dataset, args.results)
     
     syn_df["td"] = np.round(syn_df["td"])
     syn_df["pkt"] = np.round(syn_df["pkt"])
@@ -625,16 +631,13 @@ def run_netflow_dist_metrics(args):
 
 
 def run_netflow_qualitative_plots(args):
-    print("Dataset:", args.dataset)
-    # raw_df = rename_netflow(
-    #     netflow_csv_file=os.path.join(data_baseDir, dataset, "raw.csv"),
-    #     file_type=dataset)
-    raw_df = pd.read_csv(os.path.join(args.dataset, "raw.csv"))
+    print("Raw Dataset:", args.raw_dataset)
+    print("Syn Dataset:", args.syn_dataset)
+    raw_df = pd.read_csv(args.raw_dataset)
     os.makedirs(args.results, exist_ok=True)
 
-    # print(raw_df.head())
     syn_df_dict = {}
-    syn_df = pd.read_csv(os.path.join(args.dataset, "syn.csv"))
+    syn_df = pd.read_csv(args.syn_dataset)
     syn_df_dict["NetShare"] = syn_df
 
     """for metric, xlabel in {
@@ -701,11 +704,10 @@ def run_netflow_qualitative_plots(args):
 
 def run_pcap_dist_metrics(args):
     meta_metric_dict_pcap = {}
-    raw_df = pd.read_csv(os.path.join(args.dataset, "raw.csv"))
+    raw_df = pd.read_csv(args.raw_dataset)
 
     meta_metric_dict_pcap["NetShare"] = {}
-    syn_df_file = os.path.join(args.dataset, "syn.csv")
-    syn_df = pd.read_csv(syn_df_file)
+    syn_df = pd.read_csv(args.syn_dataset)
 
     metrics_dict = compute_metrics_pcap_v3(raw_df, syn_df)
     for metric, val in metrics_dict.items():
@@ -969,7 +971,8 @@ def run_caida_flowsize():
 def main():
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--method", type=str)
-    CLI.add_argument("--dataset", type=str)
+    CLI.add_argument("--raw_dataset", type=str)
+    CLI.add_argument("--syn_dataset", type=str)
     CLI.add_argument("--results", type=str)
     # convert incoming args to a dictionary
     args = CLI.parse_args()
@@ -983,23 +986,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # run_netflow_dist_metrics()
-    # run_netflow_qualitative_plots()
-    # run_pcap_dist_metrics() XX
-    # run_pcap_qualitative_plots()
-
-    # run_netflow_dist_metrics_privacy()
-
-    # run_pcap_dist_metrics_privacy()
-
-    # run_pcap_dist_metrics_SN() XX
-
-    # PLOTTING DISTRIBUTIONAL METRICS (EMD + JSD)
-    #run_netflow_dist_metrics()
-
-    # run_pcap_dist_metrics()
-
-    # VISUAL PLOTS FOR PAPER
-    # run_ton_dstport_plot()
-    # run_ugr16_flowsize_pkt_byt()
-    # run_caida_flowsize()

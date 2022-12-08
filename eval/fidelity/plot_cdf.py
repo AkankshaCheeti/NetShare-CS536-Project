@@ -103,8 +103,8 @@ def plot_cdf(raw_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logscale=F
             
         idx += 1
     
-    plt.xlabel(xlabel, fontsize=15)
-    plt.ylabel(ylabel, fontsize=15)
+    plt.xlabel(xlabel, fontsize=16)
+    plt.ylabel(ylabel, fontsize=16)
     plt.legend(fontsize=18)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
@@ -118,11 +118,11 @@ def plot_cdf(raw_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logscale=F
 
 
 def run_ugr16_flowsize_pkt_byt(args):
-    raw_df = pd.read_csv(os.path.join(args.dataset, "raw.csv"))
+    raw_df = pd.read_csv(args.raw_dataset)
     os.makedirs(args.results, exist_ok=True)
 
     syn_df_dict = {}
-    syn_df = pd.read_csv(os.path.join(args.dataset, "syn.csv"))
+    syn_df = pd.read_csv(args.syn_dataset)
     syn_df_dict["NetShare"] = syn_df
 
     for metric, xlabel in {
@@ -145,12 +145,13 @@ def run_ugr16_flowsize_pkt_byt(args):
 
 
 def run_caida_flowsize(args):
-    print("Dataset:", args.dataset)
+    print("Raw Dataset:", args.raw_dataset)
+    print("Syn Dataset:", args.syn_dataset)
     os.makedirs(args.results, exist_ok=True)
     
-    raw_df = pd.read_csv(os.path.join(args.dataset, "raw.csv"))
+    raw_df = pd.read_csv(args.raw_dataset)
     syn_df_dict = {}
-    syn_df = pd.read_csv(os.path.join(args.dataset, "syn.csv"))
+    syn_df = pd.read_csv(args.syn_dataset)
     syn_df_dict["NetShare"] = syn_df
     
     for metric, xlabel in {
@@ -171,7 +172,8 @@ def run_caida_flowsize(args):
 def main():
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--type", type=str)
-    CLI.add_argument("--dataset", type=str)
+    CLI.add_argument("--raw_dataset", type=str)
+    CLI.add_argument("--syn_dataset", type=str)
     CLI.add_argument("--results", type=str)
     # convert incoming args to a dictionary
     args = CLI.parse_args()

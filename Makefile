@@ -18,7 +18,7 @@ export ROOT_USER 					= annusmanarchitect
 export PYTHON 						= python3
 export PYTHON_DOCKER				= $(SCRIPTS_DIR)/python3.6
 
-.DEFAULT_GOAL						:= train-no-dp
+.DEFAULT_GOAL						:= plots
 
 install-docker:
 	cd $(SCRIPTS_DIR) && $(SUDO) bash install-docker.sh
@@ -55,10 +55,10 @@ train-botnet-malicious-no-dp:
 		--config_file config_botnet_malicious_test_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --measurement
 
-# docker-train-no-dp:
-# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
-# 		--config_file config_test1_pcap_no_dp \
-# 		--measurer_file measurers_localhost.ini --measurement"
+docker-train-no-dp:
+	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --measurement"
 
 ########################################################################################
 ################################## Generate Flows ######################################
@@ -79,10 +79,10 @@ generate-no-dp:
 		--config_file config_test1_pcap_no_dp \
 		--measurer_file measurers_localhost.ini --generation
 
-# docker-generate-no-dp:
-# 	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
-# 		--config_file config_test1_pcap_no_dp \
-# 		--measurer_file measurers_localhost.ini --generation"
+docker-generate-no-dp:
+	$(PYTHON_DOCKER) "cd $(SOURCE_DIR) && $(PYTHON) main.py --root_user $(ROOT_USER) \
+		--config_file config_test1_pcap_no_dp \
+		--measurer_file measurers_localhost.ini --generation"
 
 ########################################################################################
 ################################# Generate Results #####################################
@@ -91,18 +91,21 @@ generate-no-dp:
 ######################################## CDF ###########################################
 
 generate-caida-cdf:
-	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py \
-		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/caida/ \
+	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py --type PCAP \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/caida/raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/caida/syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/caida
 
 generate-ugr16-cdf:
-	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py \
-		--type NETFLOW --dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py --type NETFLOW \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/ugr16/raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/ugr16/syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 generate-botnet-malicious-cdf:
-	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py \
-		--type PCAP --dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_cdf.py --type PCAP \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
 
 cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
@@ -112,7 +115,8 @@ cdf: generate-caida-cdf generate-ugr16-cdf generate-botnet-malicious-cdf
 generate-ugr16-barplot:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_bar_plot.py \
 		--method run_netflow_qualitative_plots \
-		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/ugr16/raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/ugr16/syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 barplots: generate-ugr16-barplot
@@ -122,22 +126,29 @@ barplots: generate-ugr16-barplot
 generate-caida-fidelity:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_bar_plot.py \
 		--method run_pcap_dist_metrics \
-		--dataset $(BACKUP_RESULTS_DIR)/caida/ \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/caida/raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/caida/syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/caida
 
 generate-botnet-malicious-fidelity:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_bar_plot.py \
 		--method run_pcap_dist_metrics \
-		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/botnet/malicious-syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/botnet-malicious
 
 generate-ugr16-fidelity:
 	cd $(EVAL_SOURCE_DIR)/fidelity && $(PYTHON) plot_bar_plot.py \
 		--method run_netflow_dist_metrics \
-		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ \
+		--raw_dataset $(BACKUP_RESULTS_DIR)/ugr16/raw.csv \
+		--syn_dataset $(BACKUP_RESULTS_DIR)/ugr16/syn.csv \
 		--results $(BACKUP_RESULTS_DIR)/plots/ugr16
 
 fidelity: generate-caida-fidelity generate-botnet-malicious-fidelity generate-ugr16-fidelity
+
+#################################### All Plots ########################################
+
+plots: cdf barplots fidelity
 
 ################################# Count-Min Sketch ####################################
 
@@ -152,11 +163,11 @@ generate-caida-cms:
 		--keys srcip --hash $(HASH) \
 		--width_scale $(WIDTH_SCALE) --depth $(DEPTH) --percentile $(PERCENTILE)
 
-# generate-botnet-malicious-cms:
-# 	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
-# 		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
-# 		--keys srcip dstip srcport dstport proto --hash $(HASH) \
-# 		--width 10000 --depth 5 --percentile $(PERCENTILE)
+generate-botnet-malicious-cms:
+	cd $(EVAL_SOURCE_DIR)/countminsketch && $(PYTHON) countminsketch.py \
+		--dataset $(BACKUP_RESULTS_DIR)/botnet-malicious/ \
+		--keys srcip dstip srcport dstport proto --hash $(HASH) \
+		--width 10000 --depth 5 --percentile $(PERCENTILE)
 
 ################################## ML Evaluations #####################################
 
@@ -169,10 +180,6 @@ anomaly-ugr16:
 anomaly-botnet:
 	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) botnet_anomaly.py \
 		--dataset $(BACKUP_RESULTS_DIR)/botnet/ --runs $(RUNS)
-
-#################################### All Plots ########################################
-
-plots: cdf barplots fidelity
 
 ########################################################################################
 ############################## Clean Synthetic Flows ###################################

@@ -217,6 +217,8 @@ def main():
     print(f"Syn Error = {round(syn_error, 2)}")
     if raw_error == 0:
         relative_error = round(abs(syn_error - raw_error) * 100, 2)
+    elif raw_error > syn_error:
+        relative_error = 0
     else:
         relative_error = round(abs(syn_error - raw_error) * 100 / raw_error, 2)
     print(f"Relative Error = {relative_error}%")
