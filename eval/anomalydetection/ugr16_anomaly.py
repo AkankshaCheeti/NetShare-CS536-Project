@@ -94,21 +94,29 @@ def process_ugr16_dataset(dataset):
 def main():
     CLI = argparse.ArgumentParser()
     CLI.add_argument("--dataset", type=str)
+    CLI.add_argument("--runs", type=int)
     args = CLI.parse_args()
     print(vars(args))
     
-    # process the raw dataset
-    (X_train_s, Y_train_s, X_test_s, Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'raw.csv'))
-    (accs_raw_train, accs_raw_test) = train_models(X_train_s, Y_train_s, X_test_s, Y_test_s)
+    (RAW_X_train_s, RAW_Y_train_s, RAW_X_test_s, RAW_Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'raw.csv'))
+    (SYN_X_train_s, SYN_Y_train_s, SYN_X_test_s, SYN_Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'syn.csv'))
+    
+    correlations = []
+    for i in range(1, args.runs+1):
+        # train models on both datasets
+        (accs_raw_train, accs_raw_test) = train_models(RAW_X_train_s, RAW_Y_train_s, RAW_X_test_s, RAW_Y_test_s)
+        (accs_syn_train, accs_syn_test) = train_models(SYN_X_train_s, SYN_Y_train_s, SYN_X_test_s, SYN_Y_test_s)
+        # compare raw and synthetic accuracies
+        print(f"Model Accuracies on Raw Dataset = {accs_raw_test}")
+        print(f"Model Accuracies on Syn Dataset = {accs_syn_test}")
+        # compare raw and synthetic accuracies
+        (spearman_correlation, pvalue) = spearmanr(list(accs_raw_test.values()), list(accs_syn_test.values()))
+        correlations.append(spearman_correlation)
+        print(f"[Run {i}] Spearman Correlation of Raw and Synthetic traces = {round(spearman_correlation, 2)} (pvalue = {pvalue})")
 
-    # process the synthetic dataset
-    (X_train_s, Y_train_s, X_test_s, Y_test_s) = process_ugr16_dataset(dataset=os.path.join(args.dataset, 'syn.csv'))
-    (accs_syn_train, accs_syn_test) = train_models(X_train_s, Y_train_s, X_test_s, Y_test_s)
-
-    # compare raw and synthetic accuracies
-    (spearman_correlation, pvalue) = spearmanr(list(accs_raw_test.values()), list(accs_syn_test.values()))
-
-    print(f"Spearman Correlation of Raw and Synthetic traces = {round(spearman_correlation, 2)} (pvalue = {pvalue})")
+    print(f"\n\nSpearman Correlations over {args.runs} runs = {correlations}\n")
+    average_spearman_correlation = np.mean(correlations)
+    print(f"\nAverage Spearman Correlation of Raw and Synthetic traces over {args.runs} runs = {round(average_spearman_correlation, 2)}\n")
 
 
 if __name__ == "__main__":

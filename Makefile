@@ -160,13 +160,15 @@ generate-caida-cms:
 
 ################################## ML Evaluations #####################################
 
+RUNS						?= 
+
 anomaly-ugr16:
 	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) ugr16_anomaly.py \
-		--dataset $(BACKUP_RESULTS_DIR)/ugr16/
+		--dataset $(BACKUP_RESULTS_DIR)/ugr16/ --runs $(RUNS)
 
-anomaly-malicious:
-	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) ugr16_anomaly.py \
-		--dataset $(BACKUP_RESULTS_DIR)/ugr16/
+anomaly-botnet:
+	cd $(EVAL_SOURCE_DIR)/anomalydetection && $(PYTHON) botnet_anomaly.py \
+		--dataset $(BACKUP_RESULTS_DIR)/botnet/ --runs $(RUNS)
 
 #################################### All Plots ########################################
 

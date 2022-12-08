@@ -59,9 +59,9 @@ def train_models(X_train_s, Y_train_s, X_test_s, Y_test_s):
 
         dict_accs_tr[models_names[i]] = round(accuracy_score(Y_tr_pred_s, Y_train_s), 2)
         dict_accs_te[models_names[i]] = round(accuracy_score(Y_te_pred_s, Y_test_s), 2)
-        print(dict_accs_tr[models_names[i]])
-        print(dict_accs_te[models_names[i]])
+        # print(dict_accs_tr[models_names[i]])
+        # print(dict_accs_te[models_names[i]])
 
-        print(confusion_matrix(Y_te_pred_s, Y_test_s))
+        # print(confusion_matrix(Y_te_pred_s, Y_test_s))
 
     return dict_accs_tr, dict_accs_te
