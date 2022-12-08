@@ -103,11 +103,11 @@ def plot_cdf(raw_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logscale=F
             
         idx += 1
     
-    plt.xlabel(xlabel, fontsize=16)
-    plt.ylabel(ylabel, fontsize=16)
-    plt.legend(fontsize=18)
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
+    plt.xlabel(xlabel, fontsize=18)
+    plt.ylabel(ylabel, fontsize=18)
+    plt.legend(fontsize=20)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
 
     if x_logscale:
         plt.xscale('log')
@@ -155,7 +155,7 @@ def run_caida_flowsize(args):
     syn_df_dict["NetShare"] = syn_df
     
     for metric, xlabel in {
-            "flow_size": "Flow size (# of packets perflow)"
+            "flow_size": "Flow size (# of packets per flow)"
         }.items():
         plot_cdf(
             raw_df=raw_df,

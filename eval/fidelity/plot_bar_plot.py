@@ -221,8 +221,8 @@ def plot_bar_port(real_df, syn_df_dict, xlabel, ylabel, plot_loc, metric, x_logs
         # ax.set_xlabel(xlabel, fontsize=14)
         # ax.set_ylabel(ylabel, fontsize=14)
         
-        plt.xlabel(xlabel, fontsize=14)
-        plt.ylabel(ylabel, fontsize=14)
+        plt.xlabel(xlabel, fontsize=16)
+        plt.ylabel(ylabel, fontsize=16)
         # plt.legend(fontsize=18)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
@@ -660,8 +660,8 @@ def run_netflow_qualitative_plots(args):
     
     """
     for metric, xlabel in {
-        "srcport": "Top {} service source port number".format(N_TOPK_SERVICE_PORTS),
-        "dstport": "Top {} service destination port number".format(N_TOPK_SERVICE_PORTS),
+        "srcport": "Top-{} source port number".format(N_TOPK_SERVICE_PORTS),
+        "dstport": "Top-{} destination port numbers".format(N_TOPK_SERVICE_PORTS),
         "proto": "IP Protocol"
     }.items():
         print("metric:", metric)
