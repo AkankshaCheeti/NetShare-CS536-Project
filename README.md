@@ -1,10 +1,12 @@
-# Practical GAN-based Synthetic IP Header Trace Generation using NetShare
+# Reproduction of Practical GAN-based Synthetic IP Header Trace Generation using NetShare 
 
-**This branch has been DEPRECATED and ONLY served as backup for camera-ready experiments. Please checkout `main` branch for latest integration/codebase. Thanks!**
+**Class Project:** [Akanksha Cheeti] [Annus Zulfiqar] [Ashwin Nambiar] [Syed Hasan Amin] [Murayyiam Parvez] [Syed Muhammed Abubaker]
+
+[[paper (SIGCOMM 2022)](https://dl.acm.org/doi/abs/10.1145/3544216.3544251)][[talk (SIGCOMM 2022)](https://www.youtube.com/watch?v=mWnFIncjtWg)][[web service demo](https://drive.google.com/file/d/1vPuneEb14A2w7fKyCJ41NAHzsvpLQP5H/view)]
 
 **Authors:** [[Yucheng Yin](https://sniperyyc.com/)] [[Zinan Lin](http://www.andrew.cmu.edu/user/zinanl/)] [[Minhao Jin](https://www.linkedin.com/in/minhao-jin-1328b8164/)] [[Giulia Fanti](https://www.andrew.cmu.edu/user/gfanti/)] [[Vyas Sekar](https://users.ece.cmu.edu/~vsekar/)]
 
-**Abstract:** We explore the feasibility of using Generative Adversarial Networks (GANs) to automatically learn generative models to generate synthetic packet- and flow header traces for network-ing tasks (e.g., telemetry, anomaly detection, provisioning). We identify key fidelity, scalability, and privacy challenges and tradeoffs in existing GAN-based approaches. By synthesizing domain-specific insights with recent advances in machine learning and privacy, we identify design choices to tackle these challenges. Building on these insights, we develop an end-to-end framework, NetShare. We evaluate NetShare on six diverse packet header traces and find that: (1) across distributional metrics and traces, it achieves 46% more accuracy than baselines, and (2) it meets users’ requirements of downstream tasks in evaluating accuracy and rank ordering of candidate approaches.
+**Abstract:** We aim to reproduce the NetShare paper from SIGCOMM 22. This paper proposes Generative Adversarial Neural Networks (GANs) for generating synthetic packet traces for applications such as telemetry and anomaly detection since real-world network traces are a scarce resource.  Using GANs for synthetic data generation is not a new concept in Machine Learning. However, networking applications are very sensitive to difficult-to-model properties of real network traces (such as inter-arrival time, flow sizes, RTTs) that are hard to capture in synthetically generated traces. The novelty in their approach involves identifying and resolving some key fidelity and scalability challenges (along with their tradeoffs) for generating synthetic traces. Key evaluations indicate 46% improvement in the distributional metrics against existing trace generation approaches. We aim to analyze how authentically their framework captures real-world trace properties and whether the generated traces bring any new data features or simply mimic the properties in the chosen datasets without adding any valuable information.
 
 # CS536 Project Setup
 
