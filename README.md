@@ -10,7 +10,7 @@ In this project, we aim to reproduce NetShare, which can tackle many of the chal
 2. Data parallelism learning was introduced in this approach to improve the scalability.
 3. To deal with privacy concerns for sharing the traces, differentially-private model training was used.
 
-![Netshare Image](plots/netshare-pipeline.jpg)
+![Netshare Image](backup_results/netshare-pipeline.jpg)
 
 The implementation didn't work out of the box so we modified some of the code base to make it easier to reproduce the work. You can find more instructions to reproduce the work below. 
 
