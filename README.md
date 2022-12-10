@@ -83,7 +83,7 @@ Did you find the results interesting ? You can replicate the experiment by follo
 
 **Class Project:** Akanksha Cheeti, Annus Zulfiqar, Ashwin Nambiar,Syed Hasan Amin, Murayyiam Parvez, Syed Muhammed Abubaker
 
-[[Class Project Slides](https://github.com/annuszulfiqar2021/NetShare/blob/project_ready/CS536_ProjectPresentation.pptx.pdf)][[Insert class project report](link)]
+[[Class Project Slides](https://github.com/annuszulfiqar2021/NetShare/blob/project_ready/CS536_ProjectPresentation.pptx.pdf)][[Class Project Report](https://github.com/annuszulfiqar2021/NetShare/blob/project_ready/purdue-cs536-fall22-paper1.pdf)]
 
 [[paper (SIGCOMM 2022)](https://dl.acm.org/doi/abs/10.1145/3544216.3544251)][[talk (SIGCOMM 2022)](https://www.youtube.com/watch?v=mWnFIncjtWg)]
 
