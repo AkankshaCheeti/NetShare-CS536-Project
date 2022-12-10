@@ -18,8 +18,13 @@ The implementation didn't work out of the box so we modified some of the code ba
 
 Most of the implementation was redone to ensure that all the experiments can be run on a single machine as opposed to the multi-machine setup recommended by the authors. 
 
+### Challenges
+One of the major challenges we faced, was to get the same resource intensive setup the authors had used for their project, it was difficult for us to obtain resources on such a scale. 
+And because of the lack of such resources, we were unable to generate traces of the similar quality as described in the paper. 
+
 ### Results
-The dataset used for these graphs are from the [CAIDA](https://www.caida.org/catalog/datasets/passive_dataset/) and UGR16[https://nesg.ugr.es/nesg-ugr16/] and a malicious botnet data from 
+The dataset used for these graphs are from the [CAIDA](https://www.caida.org/catalog/datasets/passive_dataset/) and [UGR16](https://nesg.ugr.es/nesg-ugr16/) and a malicious botnet data from [Netflow](https://github.com/dmbb/FlowLens). 
+
 We observed the following graphs after running the experiments inside the `eval` folder. 
 
 
@@ -29,6 +34,7 @@ We observed the following graphs after running the experiments inside the `eval`
   <img src="backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg" width="250" /> 
   <img src="backup_results/plots/ugr16/cdf_ugr16_pkt.jpg" width="250" />
   <img src="backup_results/plots/ugr16/bar_proto.jpg" width="250" />
+  <img src="backup_results/plots/ugr16/bar_dstport.jpg" width="250" />
 </p>
 
 The above graphs denote the 
@@ -37,8 +43,11 @@ The above graphs denote the
 - Packets
 - 5 Tuple
 - Type of protocol
+- Destination port
 
-These graphs here indicate that how the real traces and the synthetic traces have high co-relation across several properties. Hence, it generates traces with high fidelity.
+These graphs here indicate that how the real traces and the synthetic traces have high co-relation across several properties. Hence, it generates traces with high fidelity. From the above results, we can see that generated packets maintain similar fidelity as the original traces.
+
+In the paper, we also show the Jensen-Shannon Divergence for different packet fields. 
 
 #### CAIDA Results
 <p float="center">
@@ -48,12 +57,13 @@ These graphs here indicate that how the real traces and the synthetic traces hav
 </p>
 
 The above graphs denote the 
-[Count Min Sketch](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch) with respect to
+[Count Min Sketch](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch) this enables to count the frequency of the events on the streaming data. With respect to
 - Destination IP
 - Source IP
 - Five-tuple aggregation
 
-They also indicate that donwstream applications perform similar to the original traces on the telemetry applications.
+They also indicate that downstream applications perform similar to the original traces on the telemetry applications. 
+
 
 #### Downstream Testing (Botnet) Results
 <p float="center">
@@ -64,7 +74,8 @@ They also indicate that donwstream applications perform similar to the original 
 The above graphs denote the 
 [Spearman Correlation](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient) and CDF with respect to the flow size.
 
-Based on the above results, we can also determine that the generated traces perform similar to the actual traces for anomaly detection. 
+Based on the above results, we can also determine that the generated traces perform similar to the actual traces for anomaly detection. The Spearman correlation of 0.88 indicates the relation between the original and synthetic traces. This allows to use to the synthetic traces for anomaly detection. 
+
 
 #### Conculsion
 Based on the graphs,we draw the following observations from the results:
@@ -77,7 +88,11 @@ Based on the graphs,we draw the following observations from the results:
 
 4. NetShare-generated traces perform similar to original traces on Telemetry
 
+#### Acknowledgements
+We would like to thank the author (Yucheng Yin) for provid- ing synthetic traces for CAIDA and UGR generated from their compute cluster of 200 CPUs.
+
 Did you find the results interesting ? You can replicate the experiment by following setup guide below! 
+
 
 ### Project details 
 
