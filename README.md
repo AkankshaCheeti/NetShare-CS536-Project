@@ -1,15 +1,17 @@
 # Reproducing Practical GAN-based Synthetic IP Header Trace Generation using NetShare 
 
 ### Motivation
-Packet and flow level header traces are critical to many network management tasks, for instance they are used to develop new types of anomaly detection algorithms but access to such traces remains challenging due to business and privacy concerns. An alternative is to generate synthetic traces. 
+Packet and flow level header traces are critical to many network management tasks. For instance they are used to develop new types of anomaly detection algorithms and even test new hardware/software systems with trace replay but access to such traces remains challenging due to business and privacy concerns. An alternative is to generate synthetic traces. 
 
-In this project, we aim to reproduce NetShare, which can tackle many of the challenges by carefully understanding the limitations of GAN-based methods. They followed the following key ideas in building NetShare to tackle:
+In this project, we aim to reproduce NetShare, a time-series GAN-based synthetic trace generation approach presented in ACM SIGCOMM'22. NetShare can tackle many of the challenges by carefully handling the limitations of prior GAN-based methods. The key ideas from NetShare include:
 
-1. Learning synthetic models for a merged flow-level trace across epochs instead of treating header traces from each epoch as an independent tabular dataset. This reformulation captures the intra-and inter-epoch correlations of traces.
-2. Data parallelism learning was introduced in this approach to improve the scalability.
-3. To deal with privacy concerns for sharing the traces, differentially-private model training was used.
+1. Learning GAN models to generate synthetic chunks of flows (common 5-tuple) instead of treating header traces as a tabular dataset of arbitrary flows. This reformulation captures the intra-and inter-epoch correlations of traces.
+2. Data parallelism: owing to the above, a GAN for each chunk can be trained independent of the other GANs, hence scalability. Instead of sequentially training a single huge model for long period of time, many smaller models can be trained in parallel on a cluster.
+3. To deal with privacy concerns for sharing the traces, Differentially-Private Stochastic Gradient Descent (DP-SGD) can be used as the training algorithm of NetShare to generate synthetic traces that preseve privacy of target traces.
 
 ![Netshare Image](backup_results/netshare-pipeline.jpg)
+
+This figure shows the NetShare trace generation pipeline. NetShare works with both, packet header PCAPs and flow samples like NetFlow. The input packet/flow trace is split into a set of flows based on their 5-tuples (K in number), and each of these flows is further split into N chunks based on time duration of the flow. NetShare divides each flow into 10 chunks (N = 10). The packet/flow fields of these chunks are encoded using continuous and categorical encoding functions, and these ecoded chunks are fed into NetShare's DoppleGANger time-series GANs, a specific variant of time-series GANs that work well with time-series data (such as header traces!). There are N number of GANS in total, each of which learns to generate a specific chunk of any flow. Once trained, these models are used to generate synthetic (encoded) chunks, which are decoded and assembled into a full trace by sorting all the packets/flows by their timestamps.
 
 The major contribution of the project is to effectively split the input into different chunks with respect to time and then encode and train them with a time-series GAN. This allows us to process the data faster and parallely train various models to generate results faster. 
 
