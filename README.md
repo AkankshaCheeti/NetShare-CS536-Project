@@ -1,4 +1,4 @@
-# Reproduction of Practical GAN-based Synthetic IP Header Trace Generation using NetShare 
+# Reproducing of Practical GAN-based Synthetic IP Header Trace Generation using NetShare 
 
 ### Motivation
 Packet and flow level header traces are critical to many network management tasks, for instance they are used to develop new types of anomaly detection algorithms but access to such traces remains challenging due to business and privacy concerns. An alternative is to generate synthetic traces. 
