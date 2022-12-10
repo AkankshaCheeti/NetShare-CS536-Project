@@ -27,19 +27,27 @@ We noticed the following results from the work
 We analyze the downstream task of heavy hitter count estimation with Count-Min (CM) Sketch[*]. Count-Min (CM) Sketch is an algorithm that allows us to approximately count the frequency of the events on the streaming data with relatively low memory consumption.
 
 #### UGR16 Results
-![UGR16 CDF Bytes](backup_results/plots/ugr16/cdf_ugr16_byt.jpg) ![UGR16 CDF Flow size](backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg) ![UGR16 CDF Packets](backup_results/plots/ugr16/cdf_ugr16_pkt.jpg)
+<p float="center">
+  <img src="backup_results/plots/ugr16/cdf_ugr16_byt.jpg" width="250" />
+  <img src="backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg" width="250" /> 
+  <img src="backup_results/plots/ugr16/cdf_ugr16_pkt.jpg" width="250" />
+  <img src="backup_results/plots/ugr16/bar_proto.jpg" width="250" />
 </p>
 
-![UGR16 CDF Flow size](backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg)
-![UGR16 CDF Packets](backup_results/plots/ugr16/cdf_ugr16_pkt.jpg)
-![UGR16 Protocol](backup_results/plots/ugr16/bar_proto.jpg)
 #### Caida Results
-![Caida CDF Flow size](backup_results/plots/caida/cdf_caida_flow_size.jpg)
-#### Downstream Testing (Botnet) Results
-![Botnet anomaly corelation](backup_results/plots/botnet/anomaly_botnet_bar.jpg)
-![Botnet CDF](backup_results/plots/botnet/cdf_caida_flow_size.jpg)
+<p float="center">
+  <img src="backup_results/plots/caida/cms_line_csiphash_dstip_top_10.jpg" width="250" />
+  <img src="backup_results/plots/caida/cms_line_csiphash_srcip_top_10.jpg" width="250" /> 
+  <img src="backup_results/plots/caida/cms_line_csiphash_srcip-dstip-srcport-dstport-proto_top_10.jpg" width="250" />
+</p>
 
-Interesting results? 
+#### Downstream Testing (Botnet) Results
+<p float="center">
+  <img src="backup_results/plots/botnet/anomaly_botnet_bar.jpg" width="300" />
+  <img src="backup_results/plots/botnet/cdf_caida_flow_size.jpg" width="300" /> 
+</p>
+
+Did you find the results interesting ? You can replicate the experiment by following setup guide below! 
 
 <details><summary><b>(Click here for setup)</b></summary>
 <br>
