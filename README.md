@@ -38,6 +38,8 @@ The above graphs denote the
 - 5 Tuple
 - Type of protocol
 
+These graphs here indicate that how the real traces and the synthetic traces have high co-relation across several properties. Hence, it generates traces with high fidelity.
+
 #### CAIDA Results
 <p float="center">
   <img src="backup_results/plots/caida/cms_line_csiphash_dstip_top_10.jpg" width="250" />
@@ -51,6 +53,8 @@ The above graphs denote the
 - Source IP
 - Five-tuple aggregation
 
+They also indicate that donwstream applications perform similar to the original traces on the telemetry applications.
+
 #### Downstream Testing (Botnet) Results
 <p float="center">
   <img src="backup_results/plots/botnet/anomaly_botnet_bar.jpg" width="300" />
@@ -59,6 +63,8 @@ The above graphs denote the
 
 The above graphs denote the 
 [Spearman Correlation](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient) and CDF with respect to the flow size.
+
+Based on the above results, we can also determine that the generated traces perform similar to the actual traces for anomaly detection. 
 
 #### Conculsion
 Based on the graphs,we draw the following observations from the results:
