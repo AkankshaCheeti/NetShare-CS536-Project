@@ -28,10 +28,10 @@ We analyze the downstream task of heavy hitter count estimation with Count-Min (
 
 #### UGR16 Results
 <p align="left">
-  <img src="plots/ugr16/cdf_ugr16_byt.jpg" alt="UGR16 CDF Bytes"/>
+  <img src="backup_results/plots/ugr16/cdf_ugr16_byt.jpg" alt="UGR16 CDF Bytes"/>
 </p>
 <p align="center">
-  <img src="plots/ugr16/cdf_ugr16_flow_size.jpg" alt="UGR16 CDF Bytes"/>
+  <img src="backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg" alt="UGR16 CDF Bytes"/>
 </p>
 <p align="right">
   <img src="backup_results/plots/ugr16/bar_proto.jpg" alt="UGR16 CDF Bytes"/>
