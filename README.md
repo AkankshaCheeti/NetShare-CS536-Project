@@ -27,14 +27,7 @@ We noticed the following results from the work
 We analyze the downstream task of heavy hitter count estimation with Count-Min (CM) Sketch[*]. Count-Min (CM) Sketch is an algorithm that allows us to approximately count the frequency of the events on the streaming data with relatively low memory consumption.
 
 #### UGR16 Results
-<p align="left">
-  <img src="backup_results/plots/ugr16/cdf_ugr16_byt.jpg" alt="UGR16 CDF Bytes"/>
-</p>
-<p align="center">
-  <img src="backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg" alt="UGR16 CDF Bytes"/>
-</p>
-<p align="right">
-  <img src="backup_results/plots/ugr16/bar_proto.jpg" alt="UGR16 CDF Bytes"/>
+![UGR16 CDF Bytes](backup_results/plots/ugr16/cdf_ugr16_byt.jpg) ![UGR16 CDF Flow size](backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg) ![UGR16 CDF Packets](backup_results/plots/ugr16/cdf_ugr16_pkt.jpg)
 </p>
 
 ![UGR16 CDF Flow size](backup_results/plots/ugr16/cdf_ugr16_flow_size.jpg)
